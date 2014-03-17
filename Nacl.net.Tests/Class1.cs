@@ -1,0 +1,49 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using nacl;
+using NUnit.Framework;
+
+namespace Nacl.net.Tests
+{
+    [TestFixture]
+    public class CryptoScalarMultTests
+    {
+        [Test]
+        public void Test()
+        {
+            byte[] alicesk = new byte[] {
+ 0x77,0x07,0x6d,0x0a,0x73,0x18,0xa5,0x7d
+,0x3c,0x16,0xc1,0x72,0x51,0xb2,0x66,0x45
+,0xdf,0x4c,0x2f,0x87,0xeb,0xc0,0x99,0x2a
+,0xb1,0x77,0xfb,0xa5,0x1d,0xb9,0x2c,0x2a
+};
+
+            byte[] alicepk = new byte[32];
+
+            ScalarMultiplication.ScalarMultBase(alicepk, alicesk);
+
+            for (int i = 0; i < 32; ++i)
+            {
+                if (i > 0)
+                    Console.Write(",");
+                else
+                    Console.Write(" ");
+                Console.Write("0x{0:x}", (uint)alicepk[i]);
+                if (i % 8 == 7) Console.WriteLine();
+                ;
+            }
+
+            Assert.IsTrue(Enumerable.SequenceEqual(alicepk, new byte[]
+            {
+                 0x85,0x20,0xf0,0x09,0x89,0x30,0xa7,0x54
+,0x74,0x8b,0x7d,0xdc,0xb4,0x3e,0xf7,0x5a
+,0x0d,0xbf,0x3a,0x0d,0x26,0x38,0x1a,0xf4
+,0xeb,0xa4,0xa9,0x8e,0xaa,0x9b,0x4e,0x6a
+            }));
+
+        }
+    }
+}
