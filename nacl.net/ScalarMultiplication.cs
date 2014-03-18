@@ -12,22 +12,18 @@ namespace nacl
 
         public const int ScalarBytes = 32;
 
-        private static readonly byte[] Base;
+        
 
-        private static readonly uint[] MinUsp = { 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128 };
+        
 
-        static ScalarMultiplication()
+        
+
+        public static void MultiplyBase(byte[] q, byte[] n)
         {
-            Base = new byte[32];
-            Base[0] = 9;
+            Multiply(q, n, Constants.Base);
         }
 
-        public static void ScalarMultBase(byte[] q, byte[] n)
-        {
-            ScalarMult(q, n, Base);
-        }
-
-        public static void ScalarMult(byte[] q, byte[] n, byte[] p)
+        public static void Multiply(byte[] q, byte[] n, byte[] p)
         {
             ArraySegment<uint> work = new uint[96];
             byte[] e = new byte[32];
@@ -45,20 +41,20 @@ namespace nacl
                 q[i] = (byte)work[64 + i];            
         }
 
-        private static void Add(ArraySegment<uint> @out, ArraySegment<uint> a, ArraySegment<uint> b)
+        private static void Add(ArraySegment<uint> output, ArraySegment<uint> a, ArraySegment<uint> b)
         {
             uint j;
             uint u;
             u = 0;
             for (j = 0; j < 31; ++j)
             {
-                u += a[j] + b[j]; @out[j] = u & 255; u >>= 8;
+                u += a[j] + b[j]; output[j] = u & 255; u >>= 8;
             }
             u += a[31] + b[31];
-            @out[31] = u;
+            output[31] = u;
         }
 
-        private static void Sub(ArraySegment<uint> @out, ArraySegment<uint> a, ArraySegment<uint> b)
+        private static void Sub(ArraySegment<uint> output, ArraySegment<uint> a, ArraySegment<uint> b)
         {
             uint j;
             uint u;
@@ -66,11 +62,11 @@ namespace nacl
             for (j = 0; j < 31; ++j)
             {
                 u += a[j] + 65280 - b[j];
-                @out[j] = u & 255;
+                output[j] = u & 255;
                 u >>= 8;
             }
             u += a[31] - b[31];
-            @out[31] = u;
+            output[31] = u;
         }
 
         private static void Squeeze(ArraySegment<uint> a)
@@ -94,13 +90,13 @@ namespace nacl
             for (j = 0; j < 32; ++j)
                 aorig[j] = a[j];
 
-            Add(a, a, MinUsp);
+            Add(a, a, Constants.MinUsp);
             negative = (uint)(-((a[31] >> 7) & 1));
             for (j = 0; j < 32; ++j)
                 a[j] ^= negative & (aorig[j] ^ a[j]);
         }
 
-        private static void Mult(ArraySegment<uint> @out, ArraySegment<uint> a, ArraySegment<uint> b)
+        private static void Mult(ArraySegment<uint> output, ArraySegment<uint> a, ArraySegment<uint> b)
         {
             uint i;
             uint j;
@@ -111,12 +107,12 @@ namespace nacl
                 u = 0;
                 for (j = 0; j <= i; ++j) u += a[j] * b[i - j];
                 for (j = i + 1; j < 32; ++j) u += 38 * a[j] * b[i + 32 - j];
-                @out[i] = u;
+                output[i] = u;
             }
-            Squeeze(@out);
+            Squeeze(output);
         }
 
-        static void Mult121665(ArraySegment<uint> @out, ArraySegment<uint> a)
+        static void Mult121665(ArraySegment<uint> output, ArraySegment<uint> a)
         {
             uint j;
             uint u;
@@ -125,18 +121,18 @@ namespace nacl
             for (j = 0; j < 31; ++j)
             {
                 u += 121665 * a[j];
-                @out[j] = u & 255; u >>= 8;
+                output[j] = u & 255; u >>= 8;
             }
             u += 121665 * a[31];
-            @out[31] = u & 127;
+            output[31] = u & 127;
             u = 19 * (u >> 7);
             for (j = 0; j < 31; ++j)
-            { u += @out[j]; @out[j] = u & 255; u >>= 8; }
-            u += @out[j];
-            @out[j] = u;
+            { u += output[j]; output[j] = u & 255; u >>= 8; }
+            u += output[j];
+            output[j] = u;
         }
 
-        private static void Square(ArraySegment<uint> @out, ArraySegment<uint> a)
+        private static void Square(ArraySegment<uint> output, ArraySegment<uint> a)
         {
             uint i;
             uint j;
@@ -153,9 +149,9 @@ namespace nacl
                     u += a[i / 2] * a[i / 2];
                     u += 38 * a[i / 2 + 16] * a[i / 2 + 16];
                 }
-                @out[i] = u;
+                output[i] = u;
             }
-            Squeeze(@out);
+            Squeeze(output);
         }
 
         static void Select(ArraySegment<uint> p, ArraySegment<uint> q, ArraySegment<uint> r, ArraySegment<uint> s, uint b)
@@ -230,7 +226,7 @@ namespace nacl
             for (j = 0; j < 64; ++j) work[j] = xzm[j];
         }
 
-        private static void Recip(ArraySegment<uint> @out, ArraySegment<uint> z)
+        private static void Recip(ArraySegment<uint> output, ArraySegment<uint> z)
         {
             ArraySegment<uint> z2 = new uint[32];
             ArraySegment<uint> z9 = new uint[32];
@@ -337,7 +333,7 @@ namespace nacl
             /* 2^255 - 2^5 */
             Square(t1, t0);
             /* 2^255 - 21 */
-            Mult(@out, t1, z11);
+            Mult(output, t1, z11);
         }
     }
 }

@@ -6,19 +6,14 @@ using System.Threading.Tasks;
 
 namespace nacl.Core
 {
-    public abstract class BaseSalsa20  : ISalsa20
+    abstract class BaseSalsa20 
     {
         public abstract int OutputBytes { get; }
         public abstract int InputBytes { get; }
         public abstract int KeyBytes { get; }
         public abstract int ConstBytes { get; }
-        
-        public void Transform(byte[] @out, byte[] @in, byte[] k, byte[] c)
-        {
-            TransformInternal(@out, @in, k, c);
-        }
 
-        protected abstract void TransformInternal(ArraySegment<byte> @out, ArraySegment<byte> @in, 
+        public abstract void Transform(ArraySegment<byte> output, ArraySegment<byte> input, 
             ArraySegment<byte> k, ArraySegment<byte> c);
 
         protected uint Rotate(uint u, int c)

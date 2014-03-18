@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace nacl.Core
 {
-    public class Salsa20 : BaseSalsa20
+    class Salsa20 : BaseSalsa20
     {
         private const int Rounds = 20;        
 
@@ -30,7 +30,7 @@ namespace nacl.Core
             get { return 16; }
         }
 
-        protected override void TransformInternal(ArraySegment<byte> @out, ArraySegment<byte> @in,
+        public override void Transform(ArraySegment<byte> output, ArraySegment<byte> input,
             ArraySegment<byte> k, ArraySegment<byte> c)
         {
             uint x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15;
@@ -43,10 +43,10 @@ namespace nacl.Core
             j3 = x3 = LoadLittleEndian(k + 8);
             j4 = x4 = LoadLittleEndian(k + 12);
             j5 = x5 = LoadLittleEndian(c + 4);
-            j6 = x6 = LoadLittleEndian(@in + 0);
-            j7 = x7 = LoadLittleEndian(@in + 4);
-            j8 = x8 = LoadLittleEndian(@in + 8);
-            j9 = x9 = LoadLittleEndian(@in + 12);
+            j6 = x6 = LoadLittleEndian(input + 0);
+            j7 = x7 = LoadLittleEndian(input + 4);
+            j8 = x8 = LoadLittleEndian(input + 8);
+            j9 = x9 = LoadLittleEndian(input + 12);
             j10 = x10 = LoadLittleEndian(c + 8);
             j11 = x11 = LoadLittleEndian(k + 16);
             j12 = x12 = LoadLittleEndian(k + 20);
@@ -107,22 +107,22 @@ namespace nacl.Core
             x14 += j14;
             x15 += j15;
 
-            StoreLittleEndian(@out + 0, x0);
-            StoreLittleEndian(@out + 4, x1);
-            StoreLittleEndian(@out + 8, x2);
-            StoreLittleEndian(@out + 12, x3);
-            StoreLittleEndian(@out + 16, x4);
-            StoreLittleEndian(@out + 20, x5);
-            StoreLittleEndian(@out + 24, x6);
-            StoreLittleEndian(@out + 28, x7);
-            StoreLittleEndian(@out + 32, x8);
-            StoreLittleEndian(@out + 36, x9);
-            StoreLittleEndian(@out + 40, x10);
-            StoreLittleEndian(@out + 44, x11);
-            StoreLittleEndian(@out + 48, x12);
-            StoreLittleEndian(@out + 52, x13);
-            StoreLittleEndian(@out + 56, x14);
-            StoreLittleEndian(@out + 60, x15);
+            StoreLittleEndian(output + 0, x0);
+            StoreLittleEndian(output + 4, x1);
+            StoreLittleEndian(output + 8, x2);
+            StoreLittleEndian(output + 12, x3);
+            StoreLittleEndian(output + 16, x4);
+            StoreLittleEndian(output + 20, x5);
+            StoreLittleEndian(output + 24, x6);
+            StoreLittleEndian(output + 28, x7);
+            StoreLittleEndian(output + 32, x8);
+            StoreLittleEndian(output + 36, x9);
+            StoreLittleEndian(output + 40, x10);
+            StoreLittleEndian(output + 44, x11);
+            StoreLittleEndian(output + 48, x12);
+            StoreLittleEndian(output + 52, x13);
+            StoreLittleEndian(output + 56, x14);
+            StoreLittleEndian(output + 60, x15);
         }
 
         

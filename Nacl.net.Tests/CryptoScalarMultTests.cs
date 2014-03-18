@@ -23,7 +23,7 @@ namespace Nacl.net.Tests
 
             byte[] alicepk = new byte[32];
 
-            ScalarMultiplication.ScalarMultBase(alicepk, alicesk);
+            ScalarMultiplication.MultiplyBase(alicepk, alicesk);
 
             for (int i = 0; i < 32; ++i)
             {
