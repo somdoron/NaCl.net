@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Security;
 using System.Text;
@@ -10,59 +11,104 @@ namespace nacl
 {
   public class SecretBox
   {
-    private byte[] m_key;
     private XSalsa20Stream m_xSalsa20Stream;
+    OneTimeAuthentication m_oneTimeAuthentication = new OneTimeAuthentication();
 
-    public const int KeyBytes = 32;    
-    public const int NonceBytes = 24;
-    public const int ZeroBytes = 32;
-    public const int BoxZeroBytes = 16;
-    public const int MACBytes = ZeroBytes - BoxZeroBytes;
+    /// <summary>
+    /// The size of the secret box key in bytes
+    /// </summary>
+    public const int KeySize = 32;
 
-    public SecretBox(byte[] key)
+    /// <summary>
+    /// The size of the secret box nonce in bytes
+    /// </summary>
+    public const int NonceSize = 24;
+
+    /// <summary>
+    /// The amount of zeros in the begining of the plain message
+    /// </summary>
+    public const int ZeroSize = 32;
+
+    /// <summary>
+    /// The amount of zeros in the begining of a box message
+    /// </summary>
+    public const int BoxZeroSize = 16;
+
+    /// <summary>
+    /// The size of the MAC in a box message
+    /// </summary>
+    public const int MACSize = ZeroSize - BoxZeroSize;
+
+    public SecretBox()
     {
-      m_key = key;
       m_xSalsa20Stream = new XSalsa20Stream();
     }
 
-    public void Box(byte[] cipher, byte[] message, int messageLength, byte[] nonce)
+    public SecretBox(byte[] key)
+      : this()
     {
-      if (messageLength < 32)
+      Key = key;
+    }
+
+    public byte[] Key { get; set; }
+
+    public void Box(byte[] cipher, byte[] message, byte[] nonce)
+    {
+      Box((ArraySegment<byte>)cipher, (ArraySegment<byte>)message, message.Length, (ArraySegment<byte>)nonce);
+    }
+
+    public void Box(byte[] cipher, int cipherOffset, byte[] message, int messageOffset, int messageLength, byte[] nonce,
+      int nonceOffset)
+    {
+      Box((ArraySegment<byte>)cipher + cipherOffset, (ArraySegment<byte>)message + messageOffset, 
+        messageLength, (ArraySegment<byte>)nonce + nonceOffset);
+    }
+
+    internal void Box(ArraySegment<byte> cipher, ArraySegment<byte> message, int messageLength, ArraySegment<byte> nonce)
+    {
+      if (messageLength < ZeroSize || message.Count < messageLength)
       {
-        throw new ArgumentException("messageLength must be greater than 32", "messageLength");
+        throw new ArgumentException("messageLength must be greater than " + ZeroSize, "messageLength");
       }
 
-      m_xSalsa20Stream.TransformXor(cipher, message, messageLength, nonce, m_key);
+      m_xSalsa20Stream.TransformXor(cipher, message, messageLength, nonce, Key);
 
-      Poly1305.Poly1305.Auth((ArraySegment<byte>)cipher + 16, (ArraySegment<byte>)cipher + 32, messageLength-32, cipher);      
+      m_oneTimeAuthentication.Authenticate(cipher + 16, cipher + 32, messageLength - 32, cipher);
 
-      for (int i = 0; i < 16; ++i)
+      for (int i = 0; i < BoxZeroSize; ++i)
         cipher[i] = 0;
     }
 
-    public void Open(byte[] message, byte[] cipher, int cipherLength, byte[] nonce)
+    public void Open(byte[] message, byte[] cipher, byte[] nonce)
     {
-      byte[] subkey = new byte[32];
+      Open((ArraySegment<byte>) message, (ArraySegment<byte>) cipher, cipher.Length, (ArraySegment<byte>) nonce);
+    }
 
-      if (cipherLength < 32)
+    public void Open(byte[] message, int messageOffset, byte[] cipher, int cipherOffset, int cipherLength, byte[] nonce, int nonceOffset)
+    {
+      Open((ArraySegment<byte>)message + messageOffset, (ArraySegment<byte>)cipher + cipherOffset, cipherLength, (ArraySegment<byte>)nonce + nonceOffset);
+    }
+
+    internal void Open(ArraySegment<byte> message, ArraySegment<byte> cipher, int cipherLength, ArraySegment<byte> nonce)
+    {
+      byte[] subkey = new byte[KeySize];
+
+      if (cipherLength < BoxZeroSize + MACSize)
       {
         throw new ArgumentException("cipherLength must be greater than 32", "cipherLength");
       }
 
-      m_xSalsa20Stream.Transform(subkey, 32, nonce, m_key);
+      m_xSalsa20Stream.Transform(subkey, KeySize, nonce, Key);
 
-      byte[] mac = new byte[16];
-
-      Poly1305.Poly1305.Auth(mac, (ArraySegment<byte>)cipher + 32, cipherLength - 32, subkey);
-
-      if (!Poly1305.Poly1305.Verify((ArraySegment<byte>) cipher + 16, mac))
+      if (!m_oneTimeAuthentication.Verify((ArraySegment<byte>)cipher + BoxZeroSize, (ArraySegment<byte>)cipher + BoxZeroSize + MACSize,
+        cipherLength - (BoxZeroSize + MACSize), subkey))
       {
         throw new SecurityException("mac verify failed");
       }
 
-      m_xSalsa20Stream.TransformXor(message, cipher, cipherLength, nonce, m_key);
+      m_xSalsa20Stream.TransformXor(message, cipher, cipherLength, nonce, Key);
 
-      for (int i = 0; i < 32; ++i) 
+      for (int i = 0; i < ZeroSize; ++i)
         message[i] = 0;
     }
   }

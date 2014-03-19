@@ -2,10 +2,10 @@
 {
   abstract class BaseStream
   {
-    public abstract int KeyBytes { get; }
+    public abstract int KeySize { get; }
 
 
-    public abstract int NonceBytes { get; }
+    public abstract int NonceSize { get; }
 
 
     public abstract void Transform(ArraySegment<byte> cipher, int cipherLength,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -10,24 +11,43 @@ namespace nacl
 {
   public class PublicKeyBox
   {
-    public const int PublicKeyBytes = 32;
+    public const int PublicKeySize = 32;
     
-    public const int SecretKeyBytes = 32;
+    public const int SecretKeySize = 32;
     
-    public const int NonceBytes = 24;
+    public const int NonceSize = 24;
     
-    public const int ZeroBytes = 32;
+    public const int ZeroSize = 32;
     
-    public const int BoxZeroBytes = 16;
+    public const int BoxZeroSize = 16;
     
-    public const int MACBytes = ZeroBytes - BoxZeroBytes;
+    public const int MACSize = ZeroSize - BoxZeroSize;
         
     private readonly SecretBox m_secretBox;
+   
+    HSalsa20 m_salsa20 = new HSalsa20();
+
+    public PublicKeyBox(byte[] publicKey, byte[] secretKey)
+    {
+      m_secretBox = new SecretBox();
+      SetKeys(publicKey, secretKey);
+    }
+
+    public void SetKeys(byte[] publicKey, byte[] secretKey)
+    {
+      byte[] s = new byte[ScalarMultiplication.OutputSize];
+      ScalarMultiplication.Multiply(s, secretKey, publicKey);
+
+      byte[] key = new byte[m_salsa20.OutputSize];
+
+      m_salsa20.Transform(key, Constants.N, s, Constants.Sigma);
+      m_secretBox.Key = key;
+    }
 
     public KeyPair GenerateKeyPair()
-    {     
-      byte[] publickKey = new byte[PublicKeyBytes];
-      byte[] secretKey = new byte[SecretKeyBytes];
+    {
+      byte[] publickKey = new byte[PublicKeySize];
+      byte[] secretKey = new byte[SecretKeySize];
 
       RNGCryptoServiceProvider random = new RNGCryptoServiceProvider();
 
@@ -38,28 +58,24 @@ namespace nacl
       return new KeyPair(publickKey, secretKey);
     }
 
-    public PublicKeyBox(byte[] publicKey, byte[] secretKey)
+    public void Box(byte[] cipher, byte[] message, byte[] nonce)
     {
-      HSalsa20 salsa20 = new HSalsa20();
-
-      byte[] s = new byte[salsa20.KeyBytes];
-      ScalarMultiplication.Multiply(s, secretKey, publicKey);
-
-      byte[] key = new byte[salsa20.OutputBytes];
-      
-      salsa20.Transform(key, Constants.N, s, Constants.Sigma);
-
-      m_secretBox = new SecretBox(key);
+      m_secretBox.Box(cipher, message, nonce);
     }
 
-    public void Box(byte[] cipher, byte[] message, int messageLength, byte[] nonce)
+    public void Box(byte[] cipher, int cipherOffset, byte[] message, int messageOffset,int messageLength, byte[] nonce, int nonceOffset)
     {
-      m_secretBox.Box(cipher, message, messageLength, nonce);
+      m_secretBox.Box(cipher, cipherOffset, message, messageOffset, messageLength, nonce, nonceOffset);
     }
 
-    public void Open(byte[] message, byte[] cipher, int cipherLength, byte[] nonce)
+    public void Open(byte[] message, byte[] cipher, byte[] nonce)
     {
-      m_secretBox.Open(message, cipher, cipherLength, nonce);
+      m_secretBox.Open(message, cipher, nonce);
+    }
+
+    public void Open(byte[] message, int messageOffset, byte[] cipher, int cipherOffset, int cipherLength, byte[] nonce, int nonceOffset)
+    {
+      m_secretBox.Open(message, messageOffset, cipher, cipherOffset, cipherLength, nonce, nonceOffset);
     }
   }
 }

@@ -11,12 +11,12 @@ namespace nacl.Stream
   {
     Salsa20 m_salsa20 = new Salsa20();
 
-    public override int KeyBytes
+    public override int KeySize
     {
       get { return 32; }
     }
 
-    public override int NonceBytes
+    public override int NonceSize
     {
       get
       {

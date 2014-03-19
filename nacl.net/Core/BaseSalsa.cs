@@ -8,10 +8,10 @@ namespace nacl.Core
 {
     abstract class BaseSalsa20 
     {
-        public abstract int OutputBytes { get; }
-        public abstract int InputBytes { get; }
-        public abstract int KeyBytes { get; }
-        public abstract int ConstBytes { get; }
+        public abstract int OutputSize { get; }
+        public abstract int InputSize { get; }
+        public abstract int KeySize { get; }
+        public abstract int ConstSize { get; }
 
         public abstract void Transform(ArraySegment<byte> output, ArraySegment<byte> input, 
             ArraySegment<byte> k, ArraySegment<byte> c);

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace nacl
 {
-  public struct ArraySegment<T> : IEnumerable<T>
+  internal struct ArraySegment<T> : IEnumerable<T>
   {
     private readonly T[] m_array;
     private readonly int m_offset;    
@@ -32,7 +32,14 @@ namespace nacl
 
     public int Count
     {
-      get { return m_array.Length; }
+      get
+      {
+        if (m_array == null)
+        {
+          return 0;
+        }
+        return m_array.Length;
+      }
     }
 
     public int Offset

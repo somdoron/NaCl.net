@@ -7,18 +7,78 @@ using System.Threading.Tasks;
 namespace nacl.Poly1305
 {
   abstract class Poly1305
-  {
+  {    
     public const int BlockSize = 16;
 
-    protected abstract void Blocks(ArraySegment<byte> m, int count);
-
-    public abstract void Finish(ArraySegment<byte> mac);
-
-    public abstract void Init(ArraySegment<byte> key);
-    
+    public const int KeySize = 32;
 
     protected int m_leftover;
     protected byte[] m_buffer = new byte[BlockSize];
+    protected bool m_final;
+
+    private ArraySegment<byte> m_key;
+
+    protected abstract void Blocks(ArraySegment<byte> m, int count);
+
+    protected abstract void OnFinish(ArraySegment<byte> mac);
+
+    protected abstract void OnReset();
+
+    protected abstract void OnKeyChanged();    
+
+    public ArraySegment<byte> Key
+    {
+      get { return m_key; }
+      set
+      {
+        bool equal = true;
+
+        if (value.Count < KeySize)
+        {
+          throw new ArgumentException("value size must be greater or equal to " + KeySize.ToString());
+        }
+
+        Reset();
+
+        if (m_key.Count < KeySize)
+        {
+          equal = false;
+        }
+        else
+        {
+          for (int i = 0; i < KeySize; i++)
+          {
+            if (Key[i] != value[i])
+            {
+              equal = false;
+              break;
+            }
+          }
+        }        
+
+        if (!equal)
+        {
+          m_key = value;          
+          OnKeyChanged();          
+        }        
+      }
+    }
+
+    public virtual void Reset()
+    {      
+      m_leftover = 0;
+      m_final = false;
+
+      Array.Clear(m_buffer, 0, m_buffer.Length);
+
+      OnReset();
+    }
+
+    public void Finish(ArraySegment<byte> mac)
+    {
+      OnFinish(mac);
+      Reset();      
+    }
 
     public void Transform(ArraySegment<byte> message, int count)
     {
@@ -62,15 +122,7 @@ namespace nacl.Poly1305
     public static Poly1305 Create()
     {
       return new Poly1305_32Bit();
-    }
-
-    public static void Auth(ArraySegment<byte> mac, ArraySegment<byte> message, int count, ArraySegment<byte> key)
-    {
-      var poly1305 = Create();
-      poly1305.Init(key);
-      poly1305.Transform(message, count);
-      poly1305.Finish(mac);
-    }
+    }    
 
     public static bool Verify(ArraySegment<byte> mac1, ArraySegment<byte> mac2)
     {      

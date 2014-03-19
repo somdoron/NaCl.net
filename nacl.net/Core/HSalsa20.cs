@@ -10,22 +10,22 @@ namespace nacl.Core
     {
         private const int Rounds = 20;
 
-        public override int OutputBytes
+        public override int OutputSize
         {
             get { return 32; }
         }
 
-        public override int InputBytes
+        public override int InputSize
         {
             get { return 16; }
         }
 
-        public override int KeyBytes
+        public override int KeySize
         {
             get { return 32; }
         }
 
-        public override int ConstBytes
+        public override int ConstSize
         {
             get { return 16; }
         }

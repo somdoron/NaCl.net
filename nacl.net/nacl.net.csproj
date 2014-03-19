@@ -42,12 +42,11 @@
   <ItemGroup>
     <Compile Include="ArraySegment.cs" />
     <Compile Include="KeyPair.cs" />
+    <Compile Include="OneTimeAuthentication.cs" />
     <Compile Include="PublicKeyBox.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Core\BaseSalsa.cs" />
     <Compile Include="Core\HSalsa20.cs" />
-    <Compile Include="Core\Salsa2012.cs" />
-    <Compile Include="Core\Salsa208.cs" />
     <Compile Include="ScalarMultiplication.cs" />
     <Compile Include="Poly1305\Poly1305.cs" />
     <Compile Include="Poly1305\Poly1305_32Bit.cs" />
