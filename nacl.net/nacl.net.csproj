@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArraySegment.cs" />
+    <Compile Include="SecretAuthentication.cs" />
     <Compile Include="KeyPair.cs" />
     <Compile Include="OneTimeAuthentication.cs" />
     <Compile Include="PublicKeyBox.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Stream\BaseStream.cs" />
     <Compile Include="Stream\Salsa20Stream.cs" />
     <Compile Include="Stream\XSalsaStream.cs" />
+    <Compile Include="StringCompare.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

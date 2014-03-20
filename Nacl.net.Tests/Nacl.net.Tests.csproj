@@ -45,6 +45,7 @@
     <Compile Include="CryptoScalarMultTests.cs" />
     <Compile Include="OneTimeAuthTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SecretAuthenticationTests.cs" />
     <Compile Include="SecretBoxTests.cs" />
   </ItemGroup>
   <ItemGroup>

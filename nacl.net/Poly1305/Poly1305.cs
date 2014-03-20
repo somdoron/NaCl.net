@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace nacl.Poly1305
 {
   abstract class Poly1305
-  {    
+  {
     public const int BlockSize = 16;
 
     public const int KeySize = 32;
@@ -24,7 +24,7 @@ namespace nacl.Poly1305
 
     protected abstract void OnReset();
 
-    protected abstract void OnKeyChanged();    
+    protected abstract void OnKeyChanged();
 
     public ArraySegment<byte> Key
     {
@@ -54,18 +54,18 @@ namespace nacl.Poly1305
               break;
             }
           }
-        }        
+        }
 
         if (!equal)
         {
-          m_key = value;          
-          OnKeyChanged();          
-        }        
+          m_key = value;
+          OnKeyChanged();
+        }
       }
     }
 
     public virtual void Reset()
-    {      
+    {
       m_leftover = 0;
       m_final = false;
 
@@ -77,7 +77,7 @@ namespace nacl.Poly1305
     public void Finish(ArraySegment<byte> mac)
     {
       OnFinish(mac);
-      Reset();      
+      Reset();
     }
 
     public void Transform(ArraySegment<byte> message, int count)
@@ -122,17 +122,6 @@ namespace nacl.Poly1305
     public static Poly1305 Create()
     {
       return new Poly1305_32Bit();
-    }    
-
-    public static bool Verify(ArraySegment<byte> mac1, ArraySegment<byte> mac2)
-    {      
-      uint dif = 0;
-      for (int i = 0; i < 16; i++)
-        dif |= (uint)((mac1[i] ^ mac2[i]));
-            
-      dif = (dif - 1) >> ((4 * 8) - 1);
-	    
-      return (dif & 1) == 1;
     }
   }
 }

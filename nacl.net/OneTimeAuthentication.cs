@@ -56,7 +56,7 @@ namespace nacl
       m_poly1305.Transform(input, inputLength);
       m_poly1305.Finish(correct);
 
-      return Poly1305.Poly1305.Verify(hash, correct);
+      return SafeComparison.Verify16(hash, correct);
     }
   }
 }
