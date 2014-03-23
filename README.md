@@ -29,3 +29,6 @@ Soon.
 ## Contributing?
 Because I started the project to support NetMQ only the parts needed to NetMQ are ported.
 Also some part implementation of NaCl are primitive that already exist in .Net as managed code (like AES and SHA512/SHA256) for those I didn't port the code and just wrap the .Net classes.
+
+## License
+NaCl.net is using MPLv2, you can read more at the [FAQ](http://www.mozilla.org/MPL/2.0/FAQ.html) file.
