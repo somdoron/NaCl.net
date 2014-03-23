@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0C3C4FC7-D9D4-445F-9EAC-9D652FED2D2A}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{2F2FB859-E748-49B3-9ACF-BD7F9718789D}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>nacl</RootNamespace>
-    <AssemblyName>nacl.net</AssemblyName>
+    <RootNamespace>NaCl.PerformanceTests</RootNamespace>
+    <AssemblyName>NaCl.PerformanceTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -20,16 +21,16 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -41,24 +42,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArraySegment.cs" />
-    <Compile Include="SecretAuthentication.cs" />
-    <Compile Include="KeyPair.cs" />
-    <Compile Include="OneTimeAuthentication.cs" />
-    <Compile Include="PublicKeyBox.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="Core\BaseSalsa.cs" />
-    <Compile Include="Core\HSalsa20.cs" />
-    <Compile Include="ScalarMultiplication.cs" />
-    <Compile Include="Poly1305\Poly1305.cs" />
-    <Compile Include="Poly1305\Poly1305_32Bit.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Core\Salsa20.cs" />
-    <Compile Include="SecretBox.cs" />
-    <Compile Include="Stream\BaseStream.cs" />
-    <Compile Include="Stream\Salsa20Stream.cs" />
-    <Compile Include="Stream\XSalsaStream.cs" />
-    <Compile Include="StringCompare.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\nacl.net\nacl.net.csproj">
+      <Project>{0C3C4FC7-D9D4-445F-9EAC-9D652FED2D2A}</Project>
+      <Name>nacl.net</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,17 +14,45 @@ namespace nacl
     public const int ScalarSize = 32;
 
     public static void MultiplyBase(byte[] q, byte[] n)
+    {      
+      unsafe
+      {
+        fixed (byte* qPointer = q, nPointer = n)
+        {
+          MultiplyBase(qPointer, nPointer);
+        }
+      }
+    }
+
+    private static unsafe void MultiplyBase(byte* q, byte* n)
     {
-      Multiply(q, n, Constants.Base);
+      // base
+      byte* p = stackalloc byte[32];
+      p[0] = 9;
+      Multiply(q, n, p);
     }
 
     public static void Multiply(byte[] q, byte[] n, byte[] p)
     {
-      ArraySegment<uint> work = new uint[96];
-      byte[] e = new byte[ScalarSize];
+      unsafe
+      {
+        fixed (byte* qPointer = q, nPointer = n, pPointer = p)
+        {
+          Multiply(qPointer, nPointer, pPointer);
+        }
+      }
+    }
 
-      Buffer.BlockCopy(n, 0, e, 0, ScalarSize);      
-      
+    private static unsafe void Multiply(byte* q, byte* n, byte* p)
+    {
+      uint* work = stackalloc uint[96];
+      byte* e = stackalloc byte[ScalarSize];
+
+      for (int i = 0; i < 32; i++)
+      {
+        e[i] = n[i];
+      }            
+
       e[0] &= 248;
       e[31] &= 127;
       e[31] |= 64;
@@ -44,7 +73,7 @@ namespace nacl
       }
     }
 
-    private static void Add(ArraySegment<uint> output, ArraySegment<uint> a, ArraySegment<uint> b)
+    private static unsafe void Add(uint* output, uint* a, uint* b)
     {
       uint j;
       uint u;
@@ -57,7 +86,7 @@ namespace nacl
       output[31] = u;
     }
 
-    private static void Sub(ArraySegment<uint> output, ArraySegment<uint> a, ArraySegment<uint> b)
+    private static unsafe void Sub(uint* output, uint* a, uint* b)
     {
       uint j;
       uint u;
@@ -72,7 +101,7 @@ namespace nacl
       output[31] = u;
     }
 
-    private static void Squeeze(ArraySegment<uint> a)
+    private static unsafe void Squeeze(uint* a)
     {
       uint j;
       uint u;
@@ -84,22 +113,27 @@ namespace nacl
       u += a[31]; a[31] = u;
     }
 
-    private static void Freeze(ArraySegment<uint> a)
+    private static unsafe void Freeze(uint* a)
     {
-      ArraySegment<uint> aorig = new uint[32];
+      uint* minUsp = stackalloc uint[32];
+
+      minUsp[0] = 19;
+      minUsp[31] = 128;        
+
+      uint* aorig = stackalloc uint[32];
       uint j;
       uint negative;
 
       for (j = 0; j < 32; ++j)
         aorig[j] = a[j];
 
-      Add(a, a, Constants.MinUsp);
+      Add(a, a, minUsp);
       negative = (uint)(-((a[31] >> 7) & 1));
       for (j = 0; j < 32; ++j)
         a[j] ^= negative & (aorig[j] ^ a[j]);
     }
 
-    private static void Mult(ArraySegment<uint> output, ArraySegment<uint> a, ArraySegment<uint> b)
+    private static unsafe void Mult(uint* output, uint* a, uint* b)
     {
       uint i;
       uint j;
@@ -115,7 +149,7 @@ namespace nacl
       Squeeze(output);
     }
 
-    static void Mult121665(ArraySegment<uint> output, ArraySegment<uint> a)
+    static unsafe void Mult121665(uint* output, uint* a)
     {
       uint j;
       uint u;
@@ -135,7 +169,7 @@ namespace nacl
       output[j] = u;
     }
 
-    private static void Square(ArraySegment<uint> output, ArraySegment<uint> a)
+    private static unsafe void Square(uint* output, uint* a)
     {
       uint i;
       uint j;
@@ -157,7 +191,7 @@ namespace nacl
       Squeeze(output);
     }
 
-    static void Select(ArraySegment<uint> p, ArraySegment<uint> q, ArraySegment<uint> r, ArraySegment<uint> s, uint b)
+    static unsafe void Select(uint* p, uint* q, uint* r, uint* s, uint b)
     {
       uint j;
       uint t;
@@ -172,23 +206,23 @@ namespace nacl
       }
     }
 
-    static void MainLoop(ArraySegment<uint> work, byte[] e)
+     unsafe static void MainLoop(uint* work, byte* e)
     {
-      ArraySegment<uint> xzm1 = new uint[64];
-      ArraySegment<uint> xzm = new uint[64];
-      ArraySegment<uint> xzmb = new uint[64];
-      ArraySegment<uint> xzm1b = new uint[64];
-      ArraySegment<uint> xznb = new uint[64];
-      ArraySegment<uint> xzn1b = new uint[64];
-      ArraySegment<uint> a0 = new uint[64];
-      ArraySegment<uint> a1 = new uint[64];
-      ArraySegment<uint> b0 = new uint[64];
-      ArraySegment<uint> b1 = new uint[64];
-      ArraySegment<uint> c1 = new uint[64];
-      ArraySegment<uint> r = new uint[32]; ;
-      ArraySegment<uint> s = new uint[32]; ;
-      ArraySegment<uint> t = new uint[32]; ;
-      ArraySegment<uint> u = new uint[32]; ;
+      uint* xzm1 = stackalloc uint[64];
+      uint* xzm = stackalloc uint[64];
+      uint* xzmb = stackalloc uint[64];
+      uint* xzm1b = stackalloc uint[64];
+      uint* xznb = stackalloc uint[64];
+      uint* xzn1b = stackalloc uint[64];
+      uint* a0 = stackalloc uint[64];
+      uint* a1 = stackalloc uint[64];
+      uint* b0 = stackalloc uint[64];
+      uint* b1 = stackalloc uint[64];
+      uint* c1 = stackalloc uint[64];
+      uint* r = stackalloc uint[32]; ;
+      uint* s = stackalloc uint[32]; ;
+      uint* t = stackalloc uint[32]; ;
+      uint* u = stackalloc uint[32]; ;
       uint j;
       uint b;
       int pos;
@@ -229,18 +263,18 @@ namespace nacl
       for (j = 0; j < 64; ++j) work[j] = xzm[j];
     }
 
-    private static void Recip(ArraySegment<uint> output, ArraySegment<uint> z)
+     private static unsafe void Recip(uint* output, uint* z)
     {
-      ArraySegment<uint> z2 = new uint[32];
-      ArraySegment<uint> z9 = new uint[32];
-      ArraySegment<uint> z11 = new uint[32];
-      ArraySegment<uint> z2_5_0 = new uint[32];
-      ArraySegment<uint> z2_10_0 = new uint[32];
-      ArraySegment<uint> z2_20_0 = new uint[32];
-      ArraySegment<uint> z2_50_0 = new uint[32];
-      ArraySegment<uint> z2_100_0 = new uint[32];
-      ArraySegment<uint> t0 = new uint[32];
-      ArraySegment<uint> t1 = new uint[32];
+      uint* z2 = stackalloc uint[32];
+      uint* z9 = stackalloc uint[32];
+      uint* z11 = stackalloc uint[32];
+      uint* z2_5_0 = stackalloc uint[32];
+      uint* z2_10_0 = stackalloc uint[32];
+      uint* z2_20_0 = stackalloc uint[32];
+      uint* z2_50_0 = stackalloc uint[32];
+      uint* z2_100_0 = stackalloc uint[32];
+      uint* t0 = stackalloc uint[32];
+      uint* t1 = stackalloc uint[32];
       int i;
 
       /* 2 */
@@ -340,5 +374,6 @@ namespace nacl
     }
   }
 }
+
 
 

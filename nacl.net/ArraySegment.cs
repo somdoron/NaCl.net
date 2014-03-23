@@ -10,13 +10,13 @@ namespace nacl
   internal struct ArraySegment<T> : IEnumerable<T>
   {
     private readonly T[] m_array;
-    private readonly int m_offset;    
+    private readonly int m_offset;
 
     public ArraySegment(T[] array, int offset)
     {
       m_array = array;
-      m_offset = offset;      
-    }    
+      m_offset = offset;
+    }
 
     public ArraySegment(T[] array)
       : this(array, 0)
@@ -65,7 +65,7 @@ namespace nacl
       Array.Copy(m_array, m_offset, array, 0, Count);
 
       return array;
-    }   
+    }
 
     public static implicit operator ArraySegment<T>(T[] array)
     {
@@ -86,20 +86,10 @@ namespace nacl
     {
       get
       {
-        if (i > Count - 1)
-        {
-          throw new ArgumentOutOfRangeException("i");
-        }
-
         return m_array[i + m_offset];
       }
       set
       {
-        if (i > Count - 1)
-        {
-          throw new ArgumentOutOfRangeException("i");
-        }
-
         m_array[i + m_offset] = value;
       }
     }
@@ -108,20 +98,10 @@ namespace nacl
     {
       get
       {
-        if (i < 0 || i > Count - 1)
-        {
-          throw new ArgumentOutOfRangeException("i");
-        }
-
         return m_array[i + m_offset];
       }
       set
       {
-        if (i < 0 || i > Count - 1)
-        {
-          throw new ArgumentOutOfRangeException("i");
-        }
-
         m_array[i + m_offset] = value;
       }
     }
