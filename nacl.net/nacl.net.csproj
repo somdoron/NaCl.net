@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArraySegment.cs" />
+    <Compile Include="ScalarMultiplication.cs" />
+    <Compile Include="ScalarMultiplication64.cs" />
     <Compile Include="SecretAuthentication.cs" />
     <Compile Include="KeyPair.cs" />
     <Compile Include="OneTimeAuthentication.cs" />
@@ -49,7 +52,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Core\BaseSalsa.cs" />
     <Compile Include="Core\HSalsa20.cs" />
-    <Compile Include="ScalarMultiplication.cs" />
+    <Compile Include="ScalarMultiplication32.cs" />
     <Compile Include="Poly1305\Poly1305.cs" />
     <Compile Include="Poly1305\Poly1305_32Bit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -59,6 +62,7 @@
     <Compile Include="Stream\Salsa20Stream.cs" />
     <Compile Include="Stream\XSalsaStream.cs" />
     <Compile Include="StringCompare.cs" />
+    <Compile Include="UInt128.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
