@@ -52,6 +52,37 @@ namespace nacl
 
     public byte[] Key { get; set; }
 
+    public void EasyBox(byte[] cipher, byte[] message, byte[] nonce)
+    {
+      byte[] cipherBoxed;
+      byte[] messageBoxed;
+
+      messageBoxed = new byte[message.Length + ZeroSize];
+      Buffer.BlockCopy(message, 0, messageBoxed, ZeroSize, message.Length);
+
+      cipherBoxed = new byte[message.Length + ZeroSize];
+
+      Box(cipherBoxed, messageBoxed, nonce);
+      Array.Clear(messageBoxed, 0, message.Length);
+
+      Buffer.BlockCopy(cipherBoxed, BoxZeroSize, cipher,0 , message.Length + MACSize);
+    }
+
+    public void EaseOpen(byte[] message, byte[] cipher, byte[] nonce)
+    {
+      byte[] cipherBoxed;
+      byte[] messageBoxed;
+
+      cipherBoxed = new byte[cipher.Length + BoxZeroSize];
+      Buffer.BlockCopy(cipher, 0, cipherBoxed, BoxZeroSize, cipher.Length);
+
+      messageBoxed = new byte[cipher.Length + MACSize];
+
+      Open(messageBoxed, cipherBoxed, nonce);
+
+      Buffer.BlockCopy(messageBoxed, ZeroSize, message, 0, cipher.Length - MACSize);
+    }
+
     public void Box(byte[] cipher, byte[] message, byte[] nonce)
     {
       Box((ArraySegment<byte>)cipher, (ArraySegment<byte>)message, message.Length, (ArraySegment<byte>)nonce);

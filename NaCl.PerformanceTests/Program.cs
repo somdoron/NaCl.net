@@ -13,7 +13,7 @@ namespace NaCl.PerformanceTests
   {
     static void Main(string[] args)
     {
-      ScalarMultiplication64Test();
+      //ScalarMultiplication64Test();
 
       ScalarMultiplication32Test();
 
@@ -31,10 +31,10 @@ namespace NaCl.PerformanceTests
 
       byte[] result = new byte[32];
 
-      const int iterations = 1000;
+      const int iterations = 100;
 
       // load the caches
-      for (int i = 0; i < 1000; i++)
+      for (int i = 0; i < 100; i++)
       {
         ScalarMultiplication32.MultiplyBase(result, key);
       }

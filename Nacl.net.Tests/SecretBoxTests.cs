@@ -12,6 +12,23 @@ namespace Nacl.net.Tests
   public class SecretBoxTests
   {
     [Test]
+    public void Easy()
+    {
+      byte[] cipher = new byte[32 + 16];
+      byte[] decoded =new byte[32];
+      byte[] message = new byte[32];
+
+      byte[] nonce = new byte[24];
+      byte[] key = new byte[32];
+
+      SecretBox secretBox = new SecretBox(key);
+
+      secretBox.EasyBox(cipher, message, nonce);
+
+      secretBox.EaseOpen(decoded, cipher, nonce);
+    }
+
+    [Test]
     public void Box()
     {
       byte[] firstkey = {
