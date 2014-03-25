@@ -14,9 +14,9 @@ namespace NaCl.PerformanceTests
   {
     static void Main(string[] args)
     {
-      //ScalarMultiplication64Test();
+      ScalarMultiplication64Test();
 
-      //ScalarMultiplication32Test();
+      ScalarMultiplication32Test();
 
       SecretBoxPerformanceTest();
 
@@ -120,7 +120,8 @@ namespace NaCl.PerformanceTests
 
       stopwatch.Stop();
 
-      Console.WriteLine("32bit avg {0} microseconds", stopwatch.ElapsedMilliseconds * 1000.0 / iterations);
+      Console.WriteLine("ScalarMultiplication32bit avg {0} microseconds", stopwatch.ElapsedMilliseconds * 1000.0 / iterations);
+      Console.WriteLine("Generating {0:N0} keys per second", (iterations / (double)stopwatch.ElapsedMilliseconds) * 1000.0);
     }
 
     static private void ScalarMultiplication64Test()
@@ -151,7 +152,8 @@ namespace NaCl.PerformanceTests
       
       stopwatch.Stop();
 
-      Console.WriteLine("64bit avg {0} microseconds", stopwatch.ElapsedMilliseconds * 1000.0 / iterations);
+      Console.WriteLine("ScalarMultiplication64bit avg {0} microseconds", stopwatch.ElapsedMilliseconds * 1000.0 / iterations);
+      Console.WriteLine("Generating {0:N0} keys per second", (iterations / (double)stopwatch.ElapsedMilliseconds) * 1000.0);
     }
   }
 }
