@@ -30,6 +30,9 @@ namespace NaCl.PerformanceTests
 
       AESHMACTest();
 
+      Console.WriteLine();
+      Console.WriteLine("* AESSHA1 is for peformance comparison and not part of NaCl.net");
+
       Console.ReadLine();
     }
 
@@ -61,13 +64,13 @@ namespace NaCl.PerformanceTests
       byte[][] messages = new byte[msgNum][];
       byte[][] encryptMessages = new byte[msgNum][];
 
-      AesManaged aesManaged = new AesManaged();
-      HMACSHA256 hmacsha256 = new HMACSHA256();
+      Aes aesManaged = new AesManaged();
+      HMAC hmac = new HMACSHA1();
 
       var encrypter = aesManaged.CreateEncryptor();
 
       int encryptMessageLength = (MsgLength / encrypter.InputBlockSize) * encrypter.InputBlockSize + encrypter.InputBlockSize +
-        hmacsha256.HashSize / 8;
+        hmac.HashSize / 8;
 
       for (int i = 0; i < msgNum; i++)
       {
@@ -79,7 +82,7 @@ namespace NaCl.PerformanceTests
       // load caches
       for (int i = 0; i < 1000; i++)
       {
-        AESEncryptMessage(encrypter, hmacsha256, encryptMessages[i], messages[i]);
+        AESEncryptMessage(encrypter, hmac, encryptMessages[i], messages[i]);
         Array.Clear(encryptMessages[i], 0, encryptMessageLength);
       }
 
@@ -87,12 +90,12 @@ namespace NaCl.PerformanceTests
 
       for (int i = 0; i < msgNum; i++)
       {
-        AESEncryptMessage(encrypter, hmacsha256, encryptMessages[i], messages[i]);
+        AESEncryptMessage(encrypter, hmac, encryptMessages[i], messages[i]);
       }
 
       stopwatch.Stop();
 
-      PrintPerformance("AESSHA256 Encrypting", stopwatch.ElapsedMilliseconds, msgNum);
+      PrintPerformance("* AESSHA1 Encrypting", stopwatch.ElapsedMilliseconds, msgNum);
 
       byte[] message = new byte[MsgLength];
       var decrypter = aesManaged.CreateDecryptor();
@@ -100,37 +103,49 @@ namespace NaCl.PerformanceTests
       // load caches
       for (int i = 0; i < 1000; i++)
       {
-        AESDecrypting(decrypter, hmacsha256, encryptMessages[i]);
+        AESDecrypting(decrypter, hmac, encryptMessages[i]);
       }
 
       stopwatch.Restart();
 
       for (int i = 0; i < msgNum; i++)
       {
-        AESDecrypting(decrypter, hmacsha256, encryptMessages[i]);
+        AESDecrypting(decrypter, hmac, encryptMessages[i]);
       }
 
       stopwatch.Stop();
 
-      PrintPerformance("AESSHA256 Decrypting", stopwatch.ElapsedMilliseconds, msgNum);
+      PrintPerformance("* AESSHA1 Decrypting", stopwatch.ElapsedMilliseconds, msgNum);
     }
 
-    private static void AESDecrypting(ICryptoTransform decrypter, HMACSHA256 hmacsha256, byte[] encryptMessage)
+    private static void AESDecrypting(ICryptoTransform decrypter, HMAC hmac, byte[] encryptMessage)
     {
-      byte[] finalBlock = decrypter.TransformFinalBlock(encryptMessage, 0, encryptMessage.Length - hmacsha256.HashSize / 8);
+      byte[] finalBlock = decrypter.TransformFinalBlock(encryptMessage, 0, encryptMessage.Length - hmac.HashSize / 8);
 
-      byte[] hash = hmacsha256.ComputeHash(finalBlock);
-      SafeComparison.Verify32(hash, 0, encryptMessage, encryptMessage.Length - hmacsha256.HashSize / 8);
+      byte[] hash = hmac.ComputeHash(finalBlock);
+
+      int differentBits = 0;
+
+      int offset = encryptMessage.Length - hmac.HashSize/8;
+
+      for (int i = 0; i < hash.Length; i++)
+      {
+        differentBits |= hash[i] ^ encryptMessage[offset + i];
+      }
+
+      int result = (1 & ((differentBits - 1) >> 8));
+
+      Debug.Assert(result == 1);
     }
 
-    private static void AESEncryptMessage(ICryptoTransform encrypter, HMACSHA256 hmacsha256,
+    private static void AESEncryptMessage(ICryptoTransform encrypter, HMAC hmac,
       byte[] encryptMessage, byte[] message)
     {
       byte[] finalBlock = encrypter.TransformFinalBlock(message, 0, message.Length);
 
       Buffer.BlockCopy(finalBlock, 0, encryptMessage, 0, finalBlock.Length);
 
-      byte[] hash = hmacsha256.ComputeHash(message);
+      byte[] hash = hmac.ComputeHash(message);
       Buffer.BlockCopy(hash, 0, encryptMessage, finalBlock.Length, hash.Length);
     }
 
