@@ -15,22 +15,22 @@ namespace NaCl.PerformanceTests
 {
   class Program
   {
-    const int MsgLength = 250;  
+    const int MsgLength = 250;
 
     static void Main(string[] args)
     {
-      Console.WriteLine("Primitive           | Avg μs\t| # Per Second");
+      Console.WriteLine("Primitive           | Avg μs | # Per Second");
       Console.WriteLine("----------------------------------------------");
 
-      //ScalarMultiplication64Test();
+      ScalarMultiplication64Test();
 
-      //ScalarMultiplication32Test();
+      ScalarMultiplication32Test();
 
       SecretBoxPerformanceTest();
 
-      //AESHMACTest();
+      AESHMACTest();
 
-      Console.ReadLine();     
+      Console.ReadLine();
     }
 
     static void PrintPerformance(string primitive, long totalMilliseconds, int iterations)
@@ -44,16 +44,20 @@ namespace NaCl.PerformanceTests
         Console.Write("{0}|", primitive.PadRight(20));
       }
 
-      Console.WriteLine(" {0:N0}\t| {1:N0}", (totalMilliseconds * 1000.0) / iterations,
-        (iterations / (double)totalMilliseconds) * 1000.0);
+      string avg = ((totalMilliseconds * 1000.0) / iterations).ToString("N0");
+
+      avg = avg.PadRight(7);
+      Console.Write(" {0}|", avg);
+
+      Console.WriteLine(" {0:N0}", (iterations / (double)totalMilliseconds) * 1000.0);
     }
 
     static private void AESHMACTest()
-    {      
+    {
       const int msgNum = 30000;
-      
+
       RandomNumberGenerator randomNumberGenerator = new RNGCryptoServiceProvider();
-      
+
       byte[][] messages = new byte[msgNum][];
       byte[][] encryptMessages = new byte[msgNum][];
 
@@ -62,19 +66,19 @@ namespace NaCl.PerformanceTests
 
       var encrypter = aesManaged.CreateEncryptor();
 
-      int encryptMessageLength = (MsgLength / encrypter.InputBlockSize) * encrypter.InputBlockSize + encrypter.InputBlockSize + 
+      int encryptMessageLength = (MsgLength / encrypter.InputBlockSize) * encrypter.InputBlockSize + encrypter.InputBlockSize +
         hmacsha256.HashSize / 8;
-           
+
       for (int i = 0; i < msgNum; i++)
       {
         messages[i] = new byte[MsgLength];
         encryptMessages[i] = new byte[encryptMessageLength];
-        randomNumberGenerator.GetBytes(messages[i]);        
-      }          
+        randomNumberGenerator.GetBytes(messages[i]);
+      }
 
       // load caches
       for (int i = 0; i < 1000; i++)
-      {        
+      {
         AESEncryptMessage(encrypter, hmacsha256, encryptMessages[i], messages[i]);
         Array.Clear(encryptMessages[i], 0, encryptMessageLength);
       }
@@ -113,31 +117,31 @@ namespace NaCl.PerformanceTests
 
     private static void AESDecrypting(ICryptoTransform decrypter, HMACSHA256 hmacsha256, byte[] encryptMessage)
     {
-      byte[] finalBlock = decrypter.TransformFinalBlock(encryptMessage,0, encryptMessage.Length - hmacsha256.HashSize / 8);      
+      byte[] finalBlock = decrypter.TransformFinalBlock(encryptMessage, 0, encryptMessage.Length - hmacsha256.HashSize / 8);
 
       byte[] hash = hmacsha256.ComputeHash(finalBlock);
-      SafeComparison.Verify32(hash, 0, encryptMessage, encryptMessage.Length - hmacsha256.HashSize/8);
+      SafeComparison.Verify32(hash, 0, encryptMessage, encryptMessage.Length - hmacsha256.HashSize / 8);
     }
 
-    private static void AESEncryptMessage(ICryptoTransform encrypter, HMACSHA256 hmacsha256, 
+    private static void AESEncryptMessage(ICryptoTransform encrypter, HMACSHA256 hmacsha256,
       byte[] encryptMessage, byte[] message)
-    {      
+    {
       byte[] finalBlock = encrypter.TransformFinalBlock(message, 0, message.Length);
 
-      Buffer.BlockCopy(finalBlock, 0, encryptMessage, 0, finalBlock.Length);      
+      Buffer.BlockCopy(finalBlock, 0, encryptMessage, 0, finalBlock.Length);
 
       byte[] hash = hmacsha256.ComputeHash(message);
-      Buffer.BlockCopy(hash, 0, encryptMessage, finalBlock.Length, hash.Length);      
+      Buffer.BlockCopy(hash, 0, encryptMessage, finalBlock.Length, hash.Length);
     }
 
     static private void SecretBoxPerformanceTest()
     {
-      const int msgNum = 30000;          
+      const int msgNum = 30000;
 
       byte[] key = new byte[32];
       byte[] nonce = new byte[32];
 
-      RandomNumberGenerator randomNumberGenerator =new RNGCryptoServiceProvider();
+      RandomNumberGenerator randomNumberGenerator = new RNGCryptoServiceProvider();
       randomNumberGenerator.GetBytes(key);
       randomNumberGenerator.GetBytes(nonce);
 
@@ -159,9 +163,9 @@ namespace NaCl.PerformanceTests
       {
         secretBox.Box(encryptMessages[i], messages[i], nonce);
         Array.Clear(encryptMessages[i], 0, MsgLength + SecretBox.ZeroSize);
-      }      
-      
-      Stopwatch stopwatch = Stopwatch.StartNew();      
+      }
+
+      Stopwatch stopwatch = Stopwatch.StartNew();
 
       for (int i = 0; i < msgNum; i++)
       {
@@ -220,12 +224,12 @@ namespace NaCl.PerformanceTests
 
       stopwatch.Stop();
 
-      PrintPerformance("ScalarMult32", stopwatch.ElapsedMilliseconds, iterations);      
+      PrintPerformance("ScalarMult32", stopwatch.ElapsedMilliseconds, iterations);
     }
 
     static private void ScalarMultiplication64Test()
     {
-      byte[] key = new byte[32];      
+      byte[] key = new byte[32];
 
       for (int i = 0; i < 32; i++)
       {
@@ -246,9 +250,9 @@ namespace NaCl.PerformanceTests
 
       for (int i = 0; i < iterations; i++)
       {
-        ScalarMultiplication64.MultiplyBase(result, key);  
+        ScalarMultiplication64.MultiplyBase(result, key);
       }
-      
+
       stopwatch.Stop();
 
       PrintPerformance("ScalarMult64", stopwatch.ElapsedMilliseconds, iterations);
