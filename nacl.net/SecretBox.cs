@@ -85,43 +85,30 @@ namespace nacl
 
     public void Box(byte[] cipher, byte[] message, byte[] nonce)
     {
-      Box((ArraySegment<byte>)cipher, (ArraySegment<byte>)message, message.Length, (ArraySegment<byte>)nonce);
+      Box(cipher,0, message,0, message.Length, nonce);
     }
 
-    public void Box(byte[] cipher, int cipherOffset, byte[] message, int messageOffset, int messageLength, byte[] nonce,
-      int nonceOffset)
-    {
-      Box((ArraySegment<byte>)cipher + cipherOffset, (ArraySegment<byte>)message + messageOffset, 
-        messageLength, (ArraySegment<byte>)nonce + nonceOffset);
-    }
-
-    internal void Box(ArraySegment<byte> cipher, ArraySegment<byte> message, int messageLength, ArraySegment<byte> nonce)
-    {
-      if (messageLength < ZeroSize || message.Count < messageLength)
+    public void Box(byte[] cipher, int cipherOffset, byte[] message, int messageOffset, int messageLength, byte[] nonce)
+    {     
+      if (messageLength < ZeroSize || message.Length < messageLength)
       {
         throw new ArgumentException("messageLength must be greater than " + ZeroSize, "messageLength");
       }
 
-      m_xSalsa20Stream.TransformXor(cipher, message, messageLength, nonce, Key);
+      m_xSalsa20Stream.TransformXor(cipher, cipherOffset, message, messageOffset, messageLength, nonce,0, Key);
+      
+      m_oneTimeAuthentication.Authenticate(cipher,16 + cipherOffset, cipher, cipherOffset + 32, messageLength - 32, cipher, cipherOffset);
 
-      m_oneTimeAuthentication.Authenticate(cipher + 16, cipher + 32, messageLength - 32, cipher);
-
-      for (int i = 0; i < BoxZeroSize; ++i)
-        cipher[i] = 0;
+      Array.Clear(cipher,cipherOffset, BoxZeroSize);      
     }
 
     public void Open(byte[] message, byte[] cipher, byte[] nonce)
     {
-      Open((ArraySegment<byte>) message, (ArraySegment<byte>) cipher, cipher.Length, (ArraySegment<byte>) nonce);
+      Open( message, 0, cipher,0, cipher.Length, nonce);
     }
 
-    public void Open(byte[] message, int messageOffset, byte[] cipher, int cipherOffset, int cipherLength, byte[] nonce, int nonceOffset)
-    {
-      Open((ArraySegment<byte>)message + messageOffset, (ArraySegment<byte>)cipher + cipherOffset, cipherLength, (ArraySegment<byte>)nonce + nonceOffset);
-    }
-
-    internal void Open(ArraySegment<byte> message, ArraySegment<byte> cipher, int cipherLength, ArraySegment<byte> nonce)
-    {
+    public void Open(byte[] message, int messageOffset, byte[] cipher, int cipherOffset, int cipherLength, byte[] nonce)
+    {   
       byte[] subkey = new byte[KeySize];
 
       if (cipherLength < BoxZeroSize + MACSize)
@@ -131,16 +118,15 @@ namespace nacl
 
       m_xSalsa20Stream.Transform(subkey, KeySize, nonce, Key);
 
-      if (!m_oneTimeAuthentication.Verify((ArraySegment<byte>)cipher + BoxZeroSize, (ArraySegment<byte>)cipher + BoxZeroSize + MACSize,
-        cipherLength - (BoxZeroSize + MACSize), subkey))
+      if (!m_oneTimeAuthentication.Verify(cipher , cipherOffset + BoxZeroSize, cipher, cipherOffset  + BoxZeroSize + MACSize,
+        cipherLength - (BoxZeroSize + MACSize), subkey,0))
       {
         throw new SecurityException("mac verify failed");
       }
 
-      m_xSalsa20Stream.TransformXor(message, cipher, cipherLength, nonce, Key);
+      m_xSalsa20Stream.TransformXor(message,messageOffset, cipher,cipherOffset, cipherLength, nonce,0, Key);
 
-      for (int i = 0; i < ZeroSize; ++i)
-        message[i] = 0;
+      Array.Clear(message, messageOffset, ZeroSize);      
     }
   }
 }

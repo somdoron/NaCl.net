@@ -30,27 +30,27 @@ namespace nacl.Core
             get { return 16; }
         }
 
-        public override void Transform(ArraySegment<byte> output, ArraySegment<byte> input, ArraySegment<byte> k, ArraySegment<byte> c)
+        public override void Transform(byte[] output, int outputOffset, byte[] input, int inputOffset, byte[] k, byte[] c)
         {
             uint x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15;
             int i;
 
-            x0 = LoadLittleEndian(c + 0);
-            x1 = LoadLittleEndian(k + 0);
-            x2 = LoadLittleEndian(k + 4);
-            x3 = LoadLittleEndian(k + 8);
-            x4 = LoadLittleEndian(k + 12);
-            x5 = LoadLittleEndian(c + 4);
-            x6 = LoadLittleEndian(input + 0);
-            x7 = LoadLittleEndian(input + 4);
-            x8 = LoadLittleEndian(input + 8);
-            x9 = LoadLittleEndian(input + 12);
-            x10 = LoadLittleEndian(c + 8);
-            x11 = LoadLittleEndian(k + 16);
-            x12 = LoadLittleEndian(k + 20);
-            x13 = LoadLittleEndian(k + 24);
-            x14 = LoadLittleEndian(k + 28);
-            x15 = LoadLittleEndian(c + 12);
+            x0 = LoadLittleEndian(c , 0);
+            x1 = LoadLittleEndian(k , 0);
+            x2 = LoadLittleEndian(k , 4);
+            x3 = LoadLittleEndian(k , 8);
+            x4 = LoadLittleEndian(k , 12);
+            x5 = LoadLittleEndian(c , 4);
+            x6 = LoadLittleEndian(input , inputOffset);
+            x7 = LoadLittleEndian(input, 4 + inputOffset);
+            x8 = LoadLittleEndian(input, 8 + inputOffset);
+            x9 = LoadLittleEndian(input, 12 + inputOffset);
+            x10 = LoadLittleEndian(c , 8);
+            x11 = LoadLittleEndian(k , 16);
+            x12 = LoadLittleEndian(k , 20);
+            x13 = LoadLittleEndian(k , 24);
+            x14 = LoadLittleEndian(k , 28);
+            x15 = LoadLittleEndian(c , 12);
 
             for (i = Rounds; i > 0; i -= 2)
             {
@@ -88,14 +88,14 @@ namespace nacl.Core
                 x15 ^= Rotate(x14 + x13, 18);
             }
 
-            StoreLittleEndian(output + 0, x0);
-            StoreLittleEndian(output + 4, x5);
-            StoreLittleEndian(output + 8, x10);
-            StoreLittleEndian(output + 12, x15);
-            StoreLittleEndian(output + 16, x6);
-            StoreLittleEndian(output + 20, x7);
-            StoreLittleEndian(output + 24, x8);
-            StoreLittleEndian(output + 28, x9);
+            StoreLittleEndian(output , 0 + outputOffset, x0);
+            StoreLittleEndian(output, 4 + outputOffset, x5);
+            StoreLittleEndian(output, 8 + outputOffset, x10);
+            StoreLittleEndian(output, 12 + outputOffset, x15);
+            StoreLittleEndian(output, 16 + outputOffset, x6);
+            StoreLittleEndian(output, 20 + outputOffset, x7);
+            StoreLittleEndian(output, 24 + outputOffset, x8);
+            StoreLittleEndian(output, 28 + outputOffset, x9);
         }
     }
 }

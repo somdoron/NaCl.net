@@ -2,38 +2,94 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace nacl
 {
   public struct UInt128
-  {
-    private UInt64 m_high;
-    private UInt64 m_low;
-
-    public UInt128(UInt64 n)
+  {    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public UInt128(UInt64 n) 
     {
-      m_low = n;
-      m_high = 0;
+      Low = n;
+      High = 0;
     }
 
-    public UInt128(UInt64 high, UInt64 low)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public UInt128(UInt64 high, UInt64 low) 
     {
-      m_low = low;
-      m_high = high;
+      Low = low;
+      High = high;
     }
 
+    public ulong High;
+    public ulong Low;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator UInt64(UInt128 value)
     {
-      return value.m_low;
+      return value.Low;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator UInt128(UInt64 value)
     {
       return new UInt128(value);
-    }   
+    }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetMultiplyUInt64(ref UInt64 left, ref UInt64 right)
+    {
+      UInt64 a32 = left >> 32;
+      UInt64 a00 = left & 0xffffffffu;
+
+      UInt64 b32 = right >> 32;
+      UInt64 b00 = right & 0xffffffffu;
+
+      ulong high = a32 * b32;
+      ulong low = a00 * b00;
+
+      ulong addLow = (a32 * b00 + a00 * b32);
+      ulong addHigh = addLow >> 32;
+      addLow = addLow << 32;
+
+      ulong c = (((low & addLow) & 1) + (low >> 1) + (addLow >> 1)) >> 63;
+      high += addHigh + c;
+      low += addLow;
+
+      High = high;
+      Low = low;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AddMultiplyUInt64(ref UInt64 left,ref UInt64 right)
+    {
+      UInt64 a32 = left >> 32;
+      UInt64 a00 = left & 0xffffffffu;
+
+      UInt64 b32 = right >> 32;
+      UInt64 b00 = right & 0xffffffffu;
+
+      ulong high = a32 * b32;
+      ulong low = a00 * b00;
+
+      ulong addLow = (a32 * b00 + a00 * b32);
+      ulong addHigh = addLow >> 32;
+      addLow = addLow << 32;
+
+      ulong c = (((low & addLow) & 1) + (low >> 1) + (addLow >> 1)) >> 63;
+      high += addHigh + c;
+      low += addLow;
+
+      c = (((Low & low) & 1) + (Low >> 1) + (low >> 1)) >> 63;
+      High = High + high + c;
+      Low = Low + low;      
+    }
+    
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static UInt128 MultiplyUInt64(UInt64 left, UInt64 right)
     {      
       UInt64 a32 = left >> 32;
@@ -57,28 +113,31 @@ namespace nacl
       return new UInt128(high, low);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(UInt128 n)
     {
-      ulong c = (((m_low & n.m_low) & 1) + (m_low >> 1) + (n.m_low >> 1)) >> 63;
-      m_high = m_high + n.m_high + c;
-      m_low = m_low + n.m_low;      
+      ulong c = (((Low & n.Low) & 1) + (Low >> 1) + (n.Low >> 1)) >> 63;
+      High = High + n.High + c;
+      Low = Low + n.Low;      
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(UInt64 n)
     {
-      ulong c = (((m_low & n) & 1) + (m_low >> 1) + (n >> 1)) >> 63;
-      m_high = m_high + c;
-      m_low = m_low + n;      
+      ulong c = (((Low & n) & 1) + (Low >> 1) + (n >> 1)) >> 63;
+      High = High + c;
+      Low = Low + n;      
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static UInt128 operator *(UInt128 left, UInt64 right)
     {
       unchecked
       {
-        UInt64 a96 = left.m_high >> 32;
-        UInt64 a64 = left.m_high & 0xffffffffu;
-        UInt64 a32 = left.m_low >> 32;
-        UInt64 a00 = left.m_low & 0xffffffffu;
+        UInt64 a96 = left.High >> 32;
+        UInt64 a64 = left.High & 0xffffffffu;
+        UInt64 a32 = left.Low >> 32;
+        UInt64 a00 = left.Low & 0xffffffffu;
 
         UInt64 b32 = right >> 32;
         UInt64 b00 = right & 0xffffffffu;
@@ -104,82 +163,89 @@ namespace nacl
       }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static UInt128 operator +(UInt128 left, UInt64 right)
     {
-      ulong c = (((left.m_low & right) & 1) + (left.m_low >> 1) + (right >> 1)) >> 63;
-      ulong high = left.m_high + c;
-      ulong low = left.m_low + right;
+      ulong c = (((left.Low & right) & 1) + (left.Low >> 1) + (right >> 1)) >> 63;
+      ulong high = left.High + c;
+      ulong low = left.Low + right;
 
       return new UInt128(high, low);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static UInt128 operator +(UInt128 left, UInt128 right)
     {  
-      ulong c = (((left.m_low & right.m_low) & 1) + (left.m_low >> 1) + (right.m_low >> 1)) >> 63;
-      ulong high = left.m_high + right.m_high + c;
-      ulong low = left.m_low + right.m_low;    
+      ulong c = (((left.Low & right.Low) & 1) + (left.Low >> 1) + (right.Low >> 1)) >> 63;
+      ulong high = left.High + right.High + c;
+      ulong low = left.Low + right.Low;    
 
       return new UInt128(high, low);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static UInt128 operator >>(UInt128 value, int shift)
     {
       UInt128 shifted = new UInt128();
 
       if (shift > 63)
       {
-        shifted.m_low = value.m_high >> (shift - 64);
-        shifted.m_high = 0;
+        shifted.Low = value.High >> (shift - 64);
+        shifted.High = 0;
       }
       else
       {
-        shifted.m_high = value.m_high >> shift;
-        shifted.m_low = (value.m_high << (64 - shift)) | (value.m_low >> shift);
+        shifted.High = value.High >> shift;
+        shifted.Low = (value.High << (64 - shift)) | (value.Low >> shift);
       }
       return shifted;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static UInt128 operator <<(UInt128 value, int shift)
     {
       UInt128 shifted = new UInt128();
 
       if (shift > 63)
       {
-        shifted.m_high = value.m_low << (shift - 64);
-        shifted.m_low = 0;
+        shifted.High = value.Low << (shift - 64);
+        shifted.Low = 0;
       }
       else
       {
-        ulong ul = value.m_low >> (64 - shift);
-        shifted.m_high = ul | (value.m_high << shift);
-        shifted.m_low = value.m_low << shift;
+        ulong ul = value.Low >> (64 - shift);
+        shifted.High = ul | (value.High << shift);
+        shifted.Low = value.Low << shift;
       }
       return shifted;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static UInt128 operator &(UInt128 left, UInt64 right)
     {
       UInt128 result = left;
-      result.m_high = 0;
-      result.m_low &= right;
+      result.High = 0;
+      result.Low &= right;
 
       return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static UInt128 operator &(UInt128 left, UInt128 right)
     {
       UInt128 result = left;
-      result.m_high &= right.m_high;
-      result.m_low &= right.m_low;
+      result.High &= right.High;
+      result.Low &= right.Low;
 
       return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static UInt128 operator |(UInt128 left, UInt128 right)
     {
       UInt128 result = left;
-      result.m_high |= right.m_high;
-      result.m_low |= right.m_low;
+      result.High |= right.High;
+      result.Low |= right.Low;
       return result;
     }
   }

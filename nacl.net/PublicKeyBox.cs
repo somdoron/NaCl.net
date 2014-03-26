@@ -63,9 +63,9 @@ namespace nacl
       m_secretBox.Box(cipher, message, nonce);
     }
 
-    public void Box(byte[] cipher, int cipherOffset, byte[] message, int messageOffset,int messageLength, byte[] nonce, int nonceOffset)
+    public void Box(byte[] cipher, int cipherOffset, byte[] message, int messageOffset,int messageLength, byte[] nonce)
     {
-      m_secretBox.Box(cipher, cipherOffset, message, messageOffset, messageLength, nonce, nonceOffset);
+      m_secretBox.Box(cipher, cipherOffset, message, messageOffset, messageLength, nonce);
     }
 
     public void Open(byte[] message, byte[] cipher, byte[] nonce)
@@ -73,9 +73,9 @@ namespace nacl
       m_secretBox.Open(message, cipher, nonce);
     }
 
-    public void Open(byte[] message, int messageOffset, byte[] cipher, int cipherOffset, int cipherLength, byte[] nonce, int nonceOffset)
+    public void Open(byte[] message, int messageOffset, byte[] cipher, int cipherOffset, int cipherLength, byte[] nonce)
     {
-      m_secretBox.Open(message, messageOffset, cipher, cipherOffset, cipherLength, nonce, nonceOffset);
+      m_secretBox.Open(message, messageOffset, cipher, cipherOffset, cipherLength, nonce);
     }
   }
 }

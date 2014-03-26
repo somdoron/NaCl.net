@@ -22,13 +22,13 @@ namespace NaCl.PerformanceTests
       Console.WriteLine("Primitive           | Avg μs\t| # Per Second");
       Console.WriteLine("----------------------------------------------");
 
-      ScalarMultiplication64Test();
+      //ScalarMultiplication64Test();
 
-      ScalarMultiplication32Test();
+      //ScalarMultiplication32Test();
 
       SecretBoxPerformanceTest();
 
-      AESHMACTest();
+      //AESHMACTest();
 
       Console.ReadLine();     
     }

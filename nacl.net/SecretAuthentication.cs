@@ -60,7 +60,7 @@ namespace nacl
 
       byte[] mac2 = m_hmac.ComputeHash(message, messageOffset, messageLength);
 
-      return SafeComparison.Verify32((ArraySegment<byte>) mac + macOffset, mac2);
+      return SafeComparison.Verify32(mac , macOffset, mac2,0);
     }
 
   }

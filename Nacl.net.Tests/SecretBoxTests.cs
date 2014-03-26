@@ -192,7 +192,7 @@ namespace Nacl.net.Tests
     {
       byte[] k = new byte[SecretBox.KeySize];
       byte[] n = new byte[SecretBox.NonceSize];
-      
+
       RandomNumberGenerator random = new RNGCryptoServiceProvider();
 
       int mlen;
@@ -211,13 +211,13 @@ namespace Nacl.net.Tests
 
         SecretBox secretBox = new SecretBox(k);
 
-        secretBox.Box(c, 0, m, 0, mlen + SecretBox.ZeroSize, n, 0);
-        secretBox.Open(m2, 0, c, 0, mlen + SecretBox.ZeroSize, n, 0);
+        secretBox.Box(c, m, n);
+        secretBox.Open(m2, c, n);
 
         int i;
         for (i = 0; i < mlen + SecretBox.ZeroSize; ++i)
         {
-          Assert.AreEqual(m2[i], m[i]);          
+          Assert.AreEqual(m2[i], m[i]);
         }
       }
     }
@@ -246,7 +246,7 @@ namespace Nacl.net.Tests
 
         SecretBox secretBox = new SecretBox(k);
 
-        secretBox.Box(c, 0, m, 0, mlen + SecretBox.ZeroSize, n, 0);
+        secretBox.Box(c, m, n);
 
         int caught = 0;
         while (caught < 10)
@@ -255,7 +255,7 @@ namespace Nacl.net.Tests
 
           try
           {
-            secretBox.Open(m2, 0, c, 0, mlen + SecretBox.ZeroSize, n, 0);
+            secretBox.Open(m2, c, n);
 
             int i;
             for (i = 0; i < mlen + SecretBox.ZeroSize; ++i)
@@ -266,8 +266,8 @@ namespace Nacl.net.Tests
           catch (SecurityException ex)
           {
             caught++;
-          }          
-        }                        
+          }
+        }
       }
     }
 

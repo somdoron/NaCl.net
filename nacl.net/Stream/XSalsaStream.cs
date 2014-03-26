@@ -10,6 +10,7 @@ namespace nacl.Stream
   class XSalsa20Stream : Salsa20Stream
   {
     HSalsa20 m_hSalsa20 = new HSalsa20();
+    private byte[] m_subkey = new byte[32];
 
     public override int KeySize
     {
@@ -21,22 +22,18 @@ namespace nacl.Stream
       get { return 24; }
     }
 
-    public override void Transform(ArraySegment<byte> cipher, int cipherLength, ArraySegment<byte> nonce, ArraySegment<byte> key)
+    public override void Transform(byte[] cipher, int cipherOffset, int cipherLength, byte[] nonce, int nonceOffset, byte[] key)
     {
-      byte[] subkey = new byte[32];
+      m_hSalsa20.Transform(m_subkey, nonce, key, Constants.Sigma);
 
-      m_hSalsa20.Transform(subkey, nonce, key, Constants.Sigma);
-
-      base.Transform(cipher, cipherLength, nonce + 16, subkey);
+      base.Transform(cipher, cipherOffset, cipherLength, nonce, 16 + nonceOffset, m_subkey);
     }
 
-    public override void TransformXor(ArraySegment<byte> cipher, ArraySegment<byte> message, int messageLength, ArraySegment<byte> nonce, ArraySegment<byte> key)
-    {
-      byte[] subkey = new byte[32];
+    public override void TransformXor(byte[] cipher, int cipherOffset, byte[] message, int messageOffset, int messageLength, byte[] nonce, int nonceOffset, byte[] key)
+    {   
+      m_hSalsa20.Transform(m_subkey, nonce, key, Constants.Sigma);
 
-      m_hSalsa20.Transform(subkey, nonce, key, Constants.Sigma);
-
-      base.TransformXor(cipher, message, messageLength, nonce + 16, subkey);
+      base.TransformXor(cipher, cipherOffset, message, messageOffset, messageLength, nonce, 16 + nonceOffset, m_subkey);
     }
   }
 }

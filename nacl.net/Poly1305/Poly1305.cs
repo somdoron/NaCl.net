@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,31 +17,31 @@ namespace nacl.Poly1305
     protected byte[] m_buffer = new byte[BlockSize];
     protected bool m_final;
 
-    private ArraySegment<byte> m_key;
+    private byte[] m_key;
 
-    protected abstract void Blocks(ArraySegment<byte> m, int count);
+    protected abstract void Blocks(byte[] m, int offset, int count);
 
-    protected abstract void OnFinish(ArraySegment<byte> mac);
+    protected abstract void OnFinish(byte[] mac, int offset);
 
     protected abstract void OnReset();
 
     protected abstract void OnKeyChanged();
 
-    public ArraySegment<byte> Key
+    public byte[] Key
     {
       get { return m_key; }
       set
       {
         bool equal = true;
 
-        if (value.Count < KeySize)
+        if (value.Length < KeySize)
         {
           throw new ArgumentException("value size must be greater or equal to " + KeySize.ToString());
         }
 
         Reset();
 
-        if (m_key.Count < KeySize)
+        if (m_key == null || m_key.Length < KeySize)
         {
           equal = false;
         }
@@ -74,13 +75,14 @@ namespace nacl.Poly1305
       OnReset();
     }
 
-    public void Finish(ArraySegment<byte> mac)
+    public void Finish(byte[] mac, int offset = 0)
     {
-      OnFinish(mac);
+      OnFinish(mac, offset);
       Reset();
     }
 
-    public void Transform(ArraySegment<byte> message, int count)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Transform(byte[] message, int offset, int count)
     {
       int i;
 
@@ -91,13 +93,13 @@ namespace nacl.Poly1305
         if (want > count)
           want = count;
         for (i = 0; i < want; i++)
-          m_buffer[m_leftover + i] = message[i];
+          m_buffer[m_leftover + i] = message[i + offset];
         count -= want;
-        message += want;
+        offset += want;
         m_leftover += want;
         if (m_leftover < BlockSize)
           return;
-        Blocks(m_buffer, BlockSize);
+        Blocks(m_buffer, 0, BlockSize);
         m_leftover = 0;
       }
 
@@ -105,8 +107,8 @@ namespace nacl.Poly1305
       if (count >= BlockSize)
       {
         int want = (count & ~(BlockSize - 1));
-        Blocks(message, want);
-        message += want;
+        Blocks(message, offset, want);
+        offset += want;
         count -= want;
       }
 
@@ -114,13 +116,14 @@ namespace nacl.Poly1305
       if (count != 0)
       {
         for (i = 0; i < count; i++)
-          m_buffer[m_leftover + i] = message[i];
+          m_buffer[m_leftover + i] = message[i + offset];
         m_leftover += count;
       }
     }
 
     public static Poly1305 Create()
     {
+      // we alawys pick 32bit because it much faster
       return new Poly1305_32Bit();
     }
   }
