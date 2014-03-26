@@ -61,7 +61,7 @@
     <Compile Include="Stream\BaseStream.cs" />
     <Compile Include="Stream\Salsa20Stream.cs" />
     <Compile Include="Stream\XSalsaStream.cs" />
-    <Compile Include="StringCompare.cs" />
+    <Compile Include="SafeComparison.cs" />
     <Compile Include="UInt128.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
