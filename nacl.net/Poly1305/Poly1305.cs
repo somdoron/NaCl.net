@@ -18,6 +18,7 @@ namespace nacl.Poly1305
     protected bool m_final;
 
     private byte[] m_key;
+    private int m_keyOffset;
 
     protected abstract void Blocks(byte[] m, int offset, int count);
 
@@ -27,44 +28,34 @@ namespace nacl.Poly1305
 
     protected abstract void OnKeyChanged();
 
-    public byte[] Key
+    public int KeyOffset
     {
-      get { return m_key; }
-      set
+      get
       {
-        bool equal = true;
-
-        if (value.Length < KeySize)
-        {
-          throw new ArgumentException("value size must be greater or equal to " + KeySize.ToString());
-        }
-
-        Reset();
-
-        if (m_key == null || m_key.Length < KeySize)
-        {
-          equal = false;
-        }
-        else
-        {
-          for (int i = 0; i < KeySize; i++)
-          {
-            if (Key[i] != value[i])
-            {
-              equal = false;
-              break;
-            }
-          }
-        }
-
-        if (!equal)
-        {
-          m_key = value;
-          OnKeyChanged();
-        }
+        return m_keyOffset;
       }
     }
 
+    public byte[] Key
+    {
+      get { return m_key; }
+    }
+
+    public void SetKey(byte[] key, int keyOffset)
+    {   
+      if (key.Length - keyOffset < KeySize)
+      {
+        throw new ArgumentException("value size must be greater or equal to " + KeySize.ToString());
+      }
+
+      Reset();
+
+      m_key = key;
+      m_keyOffset = keyOffset;
+      OnKeyChanged();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public virtual void Reset()
     {
       m_leftover = 0;

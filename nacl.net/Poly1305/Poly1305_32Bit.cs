@@ -43,17 +43,17 @@ namespace nacl.Poly1305
       unchecked
       {
         // r &= 0xffffffc0ffffffc0ffffffc0fffffff 
-        m_r[0] = (BytesToInt(Key, 0)) & 0x3ffffff;
-        m_r[1] = (BytesToInt(Key, 3) >> 2) & 0x3ffff03;
-        m_r[2] = (BytesToInt(Key, 6) >> 4) & 0x3ffc0ff;
-        m_r[3] = (BytesToInt(Key, 9) >> 6) & 0x3f03fff;
-        m_r[4] = (BytesToInt(Key, 12) >> 8) & 0x00fffff;
+        m_r[0] = (BytesToInt(Key, KeyOffset + 0 )) & 0x3ffffff;
+        m_r[1] = (BytesToInt(Key, KeyOffset + 3) >> 2) & 0x3ffff03;
+        m_r[2] = (BytesToInt(Key, KeyOffset + 6) >> 4) & 0x3ffc0ff;
+        m_r[3] = (BytesToInt(Key, KeyOffset + 9) >> 6) & 0x3f03fff;
+        m_r[4] = (BytesToInt(Key, KeyOffset + 12) >> 8) & 0x00fffff;
 
         // save pad for later
-        m_pad[0] = BytesToInt(Key, 16);
-        m_pad[1] = BytesToInt(Key, 20);
-        m_pad[2] = BytesToInt(Key, 24);
-        m_pad[3] = BytesToInt(Key, 28);
+        m_pad[0] = BytesToInt(Key, KeyOffset + 16);
+        m_pad[1] = BytesToInt(Key, KeyOffset + 20);
+        m_pad[2] = BytesToInt(Key, KeyOffset + 24);
+        m_pad[3] = BytesToInt(Key, KeyOffset + 28);
       }
     }
 

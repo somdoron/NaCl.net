@@ -54,15 +54,15 @@ namespace nacl.Poly1305
         UInt64 t1;
 
         /* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
-        t0 = BytesToInt64(Key, 0);
-        t1 = BytesToInt64(Key, 8);
+        t0 = BytesToInt64(Key, KeyOffset + 0);
+        t1 = BytesToInt64(Key, KeyOffset + 8);
 
         m_r[0] = (t0) & 0xffc0fffffff;
         m_r[1] = ((t0 >> 44) | (t1 << 20)) & 0xfffffc0ffff;
         m_r[2] = ((t1 >> 24)) & 0x00ffffffc0f;
 
-        m_pad[0] = BytesToInt64(Key, 16);
-        m_pad[1] = BytesToInt64(Key, 24);
+        m_pad[0] = BytesToInt64(Key, KeyOffset + 16);
+        m_pad[1] = BytesToInt64(Key, KeyOffset + 24);
       }
     }
 
