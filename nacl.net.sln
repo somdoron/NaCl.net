@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nacl.net", "nacl.net\nacl.net.csproj", "{0C3C4FC7-D9D4-445F-9EAC-9D652FED2D2A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaCl.net", "NaCl.net\NaCl.net.csproj", "{0C3C4FC7-D9D4-445F-9EAC-9D652FED2D2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nacl.net.Tests", "Nacl.net.Tests\Nacl.net.Tests.csproj", "{4A965F1F-015B-495D-9D2F-97F014D1C6DB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaCl.PerformanceTests", "NaCl.PerformanceTests\NaCl.PerformanceTests.csproj", "{2F2FB859-E748-49B3-9ACF-BD7F9718789D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaCl.net.Tests", "NaCl.net.Tests\NaCl.net.Tests.csproj", "{4A965F1F-015B-495D-9D2F-97F014D1C6DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,16 +35,6 @@ Global
 		{4A965F1F-015B-495D-9D2F-97F014D1C6DB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{4A965F1F-015B-495D-9D2F-97F014D1C6DB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{4A965F1F-015B-495D-9D2F-97F014D1C6DB}.Release|Win32.ActiveCfg = Release|Any CPU
-		{2F2FB859-E748-49B3-9ACF-BD7F9718789D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2F2FB859-E748-49B3-9ACF-BD7F9718789D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2F2FB859-E748-49B3-9ACF-BD7F9718789D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{2F2FB859-E748-49B3-9ACF-BD7F9718789D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{2F2FB859-E748-49B3-9ACF-BD7F9718789D}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{2F2FB859-E748-49B3-9ACF-BD7F9718789D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2F2FB859-E748-49B3-9ACF-BD7F9718789D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2F2FB859-E748-49B3-9ACF-BD7F9718789D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{2F2FB859-E748-49B3-9ACF-BD7F9718789D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{2F2FB859-E748-49B3-9ACF-BD7F9718789D}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
