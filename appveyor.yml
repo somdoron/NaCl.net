@@ -1,0 +1,11 @@
+version: 0.1.{build}
+image: Visual Studio 2019
+build_script:
+- cmd: >-
+    dotnet build . /p:Configuration=Release /p:PackageVersion=%APPVEYOR_BUILD_VERSION%-pre /p:Version=%APPVEYOR_BUILD_VERSION% /verbosity:minimal
+
+    dotnet pack NaCl.net -c Release --no-build /p:PackageVersion=%APPVEYOR_BUILD_VERSION%-pre /p:Version=%APPVEYOR_BUILD_VERSION%
+test_script:
+- cmd: dotnet test NaCl.net.Tests
+artifacts:
+- path: '**/*.nupkg'

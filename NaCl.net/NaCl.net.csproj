@@ -6,6 +6,12 @@
     <RootNamespace>NaCl</RootNamespace>
     <AssemblyName>NaCl</AssemblyName>
     <TargetFrameworks>net45;net472;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <PackageId>NaCl.Net</PackageId>
+    <PackageVersion>0.1</PackageVersion>
+    <Authors>Doron Somech</Authors>
+    <Description>Port of Curve25519, XSalsa20 and Poly1305 from NaCl project</Description>
+    <PackageProjectUrl>https://github.com/somdoron/nacl.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/somdoron/nacl.net</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
