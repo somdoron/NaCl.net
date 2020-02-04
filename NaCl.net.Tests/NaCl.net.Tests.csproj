@@ -22,10 +22,4 @@
   <ItemGroup>
     <ProjectReference Include="..\NaCl.net\NaCl.net.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="..\nacl.net.snk">
-      <Link>nacl.net.snk</Link>
-    </None>
-  </ItemGroup>
 </Project>
