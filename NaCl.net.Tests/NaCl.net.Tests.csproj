@@ -4,6 +4,9 @@
     <TargetFrameworks>net472;netcoreapp3.0</TargetFrameworks>
     <AssemblyName>NaCl.Tests</AssemblyName>
     <RootNamespace>NaCl.Tests</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\nacl.net.snk</AssemblyOriginatorKeyFile>
+    <PublicSign>true</PublicSign>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,5 +21,11 @@
   
   <ItemGroup>
     <ProjectReference Include="..\NaCl.net\NaCl.net.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="..\nacl.net.snk">
+      <Link>nacl.net.snk</Link>
+    </None>
   </ItemGroup>
 </Project>

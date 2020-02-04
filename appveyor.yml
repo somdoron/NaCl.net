@@ -1,5 +1,10 @@
 version: 0.1.{build}
 image: Visual Studio 2019
+install:
+  - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
+  - cmd: appveyor-tools\secure-file -decrypt nacl.net.snk.enc -secret %SNK_SECRET% -salt %SNK_SALT%
+  - sh: ./appveyor-tools/secure-file -decrypt path-to/encrypted-filename.ext.enc -secret $SNK_SECRET -salt $SNK_SALT
+
 build_script:
 - cmd: >-
     dotnet build . /p:Configuration=Release /p:PackageVersion=%APPVEYOR_BUILD_VERSION%-pre /p:Version=%APPVEYOR_BUILD_VERSION% /verbosity:minimal

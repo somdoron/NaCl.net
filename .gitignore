@@ -32,3 +32,5 @@ _ReSharper*/
 
 packages/
 .idea/
+nacl.net.snk
+appveyor-tools/

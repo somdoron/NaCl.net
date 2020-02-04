@@ -1,7 +1,12 @@
 using System;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("NaCl.Tests")]
+[assembly: InternalsVisibleTo("NaCl.Tests, PublicKey=002400000480000094000000060" +
+                              "200000024000052534131000400000100010067b1aa21413f594425a88383ca0" +
+                              "9bcc62c34092da0cde540f8929cc026e39cf5f862faa23d96616e7050b23fd43" +
+                              "1a1007a0866c9e08aa8b1d5fdc5021f09b5302bb8545f4db589c60622f5a31d7" +
+                              "18896af939388230dd3d407fffa623dd7e75f6fef38da5bcba0b1d109f7f5ad6" +
+                              "4344bd24b995c744ca704640f511aa3ee3ba7")]
 namespace NaCl.Internal
 {
     internal class HSalsa20

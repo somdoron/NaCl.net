@@ -12,6 +12,9 @@
     <Description>Port of Curve25519, XSalsa20 and Poly1305 from NaCl project</Description>
     <PackageProjectUrl>https://github.com/somdoron/nacl.net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/somdoron/nacl.net</RepositoryUrl>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\nacl.net.snk</AssemblyOriginatorKeyFile>
+    <PublicSign>true</PublicSign>
   </PropertyGroup>
 
   <ItemGroup>
@@ -37,6 +40,12 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Memory" Version="4.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\nacl.net.snk">
+      <Link>nacl.net.snk</Link>
+    </None>
   </ItemGroup>
   
 </Project>
