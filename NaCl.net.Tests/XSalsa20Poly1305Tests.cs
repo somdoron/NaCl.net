@@ -60,7 +60,7 @@ namespace NaCl.Tests
                 0x59, 0x9b, 0x1f, 0x65, 0x4c, 0xb4, 0x5a, 0x74, 0xe3, 0x55, 0xa5
             };
 
-            var cipher = new byte[message.Length + XSalsa20Poly1305.MacLength];
+            var cipher = new byte[message.Length + XSalsa20Poly1305.TagLength];
 
             XSalsa20Poly1305 xSalsa20Poly1305 = new XSalsa20Poly1305(firstkey);
             xSalsa20Poly1305.Encrypt(cipher, message, nonce);

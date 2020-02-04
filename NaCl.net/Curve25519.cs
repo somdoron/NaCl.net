@@ -11,6 +11,12 @@ namespace NaCl
     /// </summary>
     public static class Curve25519
     {
+        /// <summary>
+        /// Length of a scalar on curve.
+        /// </summary>
+        /// <remarks>
+        /// 32 bytes length.
+        /// </remarks>
         public const int ScalarLength = 32;
 
         /// <summary>

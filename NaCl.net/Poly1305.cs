@@ -3,11 +3,27 @@ using NaCl.Internal;
 
 namespace NaCl
 {
+    /// <summary>
+    /// One-time authentication using Poly1305.
+    /// </summary>
+    /// <remarks>
+    /// Poly1305 takes a 32-byte, one-time key and a message and produces a 16-byte tag that authenticates
+    /// the message such that an attacker has a negligible chance of producing a valid tag for a
+    /// inauthentic message.
+    /// </remarks>
     public class Poly1305 : IDisposable
     {
-        public const int BlockLength = 16;
+        private const int BlockLength = 16;
+        
+        /// <summary>
+        /// The length of the key, 32 bytes.
+        /// </summary>
         public const int KeyLength = 32;
-        public const int HashLength = BlockLength;
+        
+        /// <summary>
+        /// The length of the produced tag, 16 bytes.
+        /// </summary>
+        public const int TagLength = BlockLength;
         
         UInt32[] r = new UInt32[5];
         UInt32[] h = new UInt32[5];
@@ -16,16 +32,34 @@ namespace NaCl
         byte[] buffer = new byte[BlockLength];
         bool final;
         
+        /// <summary>
+        /// Create a new Poly1305 object with the specified key.
+        /// </summary>
+        /// <param name="key">The key</param>
         public Poly1305(ReadOnlySpan<byte> key)
         {
             Initialize();
             SetKey(key);
         }
 
+        /// <summary>
+        /// Create a new Poly1305, key must be using <see>
+        ///     <cref>SetKey</cref>
+        /// </see>
+        /// before calling <see>
+        ///     <cref>Update</cref>
+        /// </see>
+        /// </summary>
         public Poly1305() => Initialize();
         
+        /// <summary>
+        /// Dispose the object and clear any sensitive buffers.
+        /// </summary>
         public void Dispose() => Reset();
 
+        /// <summary>
+        /// Reset the object to the initial state.
+        /// </summary>
         public void Reset()
         {
             Array.Clear(r, 0, 5);
@@ -37,6 +71,10 @@ namespace NaCl
             final = false;
         }
         
+        /// <summary>
+        /// Set a new key
+        /// </summary>
+        /// <param name="key">Key</param>
         public void SetKey(ReadOnlySpan<byte> key)
         {
             // r &= 0xffffffc0ffffffc0ffffffc0fffffff - wiped after finalization
@@ -53,6 +91,11 @@ namespace NaCl
             pad[3] = Common.Load32(key, 28);
         }
 
+        /// <summary>
+        /// Set a new key
+        /// </summary>
+        /// <param name="key">The key</param>
+        /// <param name="offset">The key offset</param>
         public void SetKey(byte[] key, int offset) => SetKey(new Span<byte>(key, offset, KeyLength));
 
         private void Initialize()
@@ -151,7 +194,11 @@ namespace NaCl
             h[4] = h4;
         }
 
-        public void Final(Span<byte> output)
+        /// <summary>
+        /// Complete the authentication and produce the tag.
+        /// </summary>
+        /// <param name="tag">The will be written to the parameter.</param>
+        public void Final(Span<byte> tag)
         {
             UInt32 h0, h1, h2, h3, h4, c;
             UInt32 g0, g1, g2, g3, g4;
@@ -242,17 +289,21 @@ namespace NaCl
             f = (UInt64) h3 + pad[3] + (f >> 32);
             h3 = (UInt32) f;
 
-            Common.Store(output, 0, h0);
-            Common.Store(output, 4, h1);
-            Common.Store(output, 8, h2);
-            Common.Store(output, 12, h3);
+            Common.Store(tag, 0, h0);
+            Common.Store(tag, 4, h1);
+            Common.Store(tag, 8, h2);
+            Common.Store(tag, 12, h3);
 
             Initialize();
         }
         
-        public void Update(ReadOnlySpan<byte> m)
+        /// <summary>
+        /// Update the authentication with more bytes.
+        /// </summary>
+        /// <param name="bytes">Bytes</param>
+        public void Update(ReadOnlySpan<byte> bytes)
         {
-            int count = m.Length;
+            int count = bytes.Length;
 
             // handle leftover
             if (leftover != 0)
@@ -263,10 +314,10 @@ namespace NaCl
                     want = count;
 
                 for (int i = 0; i < want; i++)
-                    buffer[leftover + i] = m[i];
+                    buffer[leftover + i] = bytes[i];
 
                 count -= want;
-                m = m.Slice(want);
+                bytes = bytes.Slice(want);
                 leftover += want;
 
                 if (leftover < BlockLength)
@@ -281,8 +332,8 @@ namespace NaCl
             {
                 int want = (count & ~(BlockLength - 1));
 
-                Blocks(m, want);
-                m = m.Slice(want);
+                Blocks(bytes, want);
+                bytes = bytes.Slice(want);
                 count -= want;
             }
 
@@ -290,18 +341,28 @@ namespace NaCl
             if (count > 0)
             {
                 for (int i = 0; i < count; i++)
-                    buffer[leftover + i] = m[i];
+                    buffer[leftover + i] = bytes[i];
 
                 leftover += count;
             }
         }
 
-        public  void Update(byte[] array, int offset, int count)
+        /// <summary>
+        /// Update the authentication with more bytes.
+        /// </summary>
+        /// <param name="bytes">Bytes</param>
+        /// <param name="offset">Offset to write bytes from</param>
+        /// <param name="count">Number of bytes to write</param>
+        public  void Update(byte[] bytes, int offset, int count)
         {
-            var span = new Span<byte>(array, offset, count);
+            var span = new Span<byte>(bytes, offset, count);
             Update(span);
         }
 
+        /// <summary>
+        /// Complete the authentication and produce the tag.
+        /// </summary>
+        /// <returns>The authentication tag</returns>
         public byte[] Final()
         {
             byte[] hash = new byte[BlockLength];
@@ -310,20 +371,35 @@ namespace NaCl
             return hash;
         }
         
-        public bool Verify(ReadOnlySpan<byte> hash, ReadOnlySpan<byte> input)
+        /// <summary>
+        /// Compute the tag of the input and verify with provided tag.
+        /// </summary>
+        /// <param name="tag">The provided tag.</param>
+        /// <param name="input">The input to compute tag for.</param>
+        /// <returns>True if the tag match the input, otherwise false</returns>
+        public bool Verify(ReadOnlySpan<byte> tag, ReadOnlySpan<byte> input)
         {
             Update(input);
             byte[] correct = Final();
 
-            return SafeComparison.Verify16(hash, correct);
+            return SafeComparison.Verify16(tag, correct);
         }
 
-        public bool Verify(byte[] hash, int hashOffset, byte[] input, int inputOffset, int inputCount)
+        /// <summary>
+        /// Compute the tag of the input and verify with provided tag.
+        /// </summary>
+        /// <param name="tag">The provided tag.</param>
+        /// <param name="tagOffset">The offset to start read the tag from</param>
+        /// <param name="input">The input to compute tag for.</param>
+        /// <param name="inputOffset">The offset to start read input from</param>
+        /// <param name="inputCount">The amount of bytes to read from the input</param>
+        /// <returns>True if the tag match the input, otherwise false</returns>
+        public bool Verify(byte[] tag, int tagOffset, byte[] input, int inputOffset, int inputCount)
         {
-            var hashSpan = new Span<byte>(hash, hashOffset, HashLength);
+            var tagSpan = new Span<byte>(tag, tagOffset, TagLength);
             var inputSpan = new Span<byte>(input, inputOffset, inputCount);
 
-            return Verify(hash, input);
+            return Verify(tagSpan, inputSpan);
         }
     }
 }

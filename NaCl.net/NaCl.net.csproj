@@ -15,6 +15,11 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\nacl.net.snk</AssemblyOriginatorKeyFile>
     <PublicSign>false</PublicSign>
+    <IncludeSource>true</IncludeSource>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Title>C# port of NaCl crypto library</Title>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>NaCl libsodium sodium curve25519 xsalsa poly1305</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
