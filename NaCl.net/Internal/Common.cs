@@ -25,7 +25,7 @@ namespace NaCl.Internal
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt32 RotateLeft(UInt32 x, int b)
+        public static UInt32 RotateLeft(in UInt32 x, in int b)
         {
             return (x << b) | (x >> (32 - b));
         }
