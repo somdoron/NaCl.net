@@ -11,10 +11,14 @@
     <Authors>Doron Somech</Authors>
     <Description>Port of Curve25519, XSalsa20 and Poly1305 from NaCl project</Description>
     <PackageProjectUrl>https://github.com/somdoron/nacl.net</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/somdoron/nacl.net</RepositoryUrl>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\nacl.net.snk</AssemblyOriginatorKeyFile>
     <PublicSign>false</PublicSign>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/somdoron/NaCl.net.git</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <Deterministic>true</Deterministic>
+    <DeterministicSourcePaths>true</DeterministicSourcePaths>
     <IncludeSource>true</IncludeSource>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Title>C# port of NaCl crypto library</Title>
