@@ -1,0 +1,30 @@
+name: release
+on:
+  release:
+    types: [published]
+
+jobs:
+ release:
+    runs-on: ubuntu-latest
+    if: "!github.event.release.prerelease"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Decrypt snk
+      uses: shinhwagk/actions-crypto@0.0.9
+      with:
+        crypto-path: nacl.net.snk.enc
+        crypto-action: dec
+        crypto-password: ${{ secrets.SNK_SECRET }}
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      shell: bash
+    - run: echo ${{ steps.get_version.outputs.VERSION }}
+    - run: dotnet restore .
+    - run: dotnet pack NaCl.net -o . -c Release /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} /p:Version=${{ steps.get_version.outputs.VERSION }} /p:ContinuousIntegrationBuild=true
+    - run: dotnet nuget push *.nupkg -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
+      env:
+        NUGET_API_KEY: ${{ secrets.NuGetAPIKey }}
+      shell: bash
+          
+
