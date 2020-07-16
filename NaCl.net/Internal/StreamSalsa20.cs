@@ -17,34 +17,39 @@ namespace NaCl.Internal
             var input = new byte[16];
             var block = new byte[64];
             var kcopy = k.ToArray();
-
-            for (int i = 0; i < 8; i++)
-                input[i] = n[i];
-            
-            while (c.Length >= 64)
+            try
             {
-                Salsa20.Transform(block, input, kcopy, null);
-
-                for (int i = 0; i < c.Length; i++)
-                    c[i] = block[i];
-
-
-                uint u = 1;
-                for (int i = 8; i < 16; i++)
+                for (int i = 0; i < 8; i++)
+                    input[i] = n[i];
+                
+                while (c.Length >= 64)
                 {
-                    u += (uint) input[i];
-                    input[i] = (byte) u;
-                    u >>= 8;
+                    Salsa20.Transform(block, input, kcopy, null);
+
+                    block.CopyTo(c);
+
+                    uint u = 1;
+                    for (int i = 8; i < 16; i++)
+                    {
+                        u += (uint) input[i];
+                        input[i] = (byte) u;
+                        u >>= 8;
+                    }
+
+                    c = c.Slice(64);
                 }
 
-                c = c.Slice(64);
+                if (c.Length != 0)
+                {
+                    Salsa20.Transform(block, input, kcopy, null);
+                    for (int i = 0; i < c.Length; i++)
+                        c[i] = block[i];
+                }
             }
-
-            if (c.Length != 0)
+            finally
             {
-                Salsa20.Transform(block, input, kcopy, null);
-                for (int i = 0; i < c.Length; i++)
-                    c[i] = block[i];
+                Array.Clear(block, 0, block.Length);
+                Array.Clear(kcopy, 0, kcopy.Length);
             }
         }
     }
