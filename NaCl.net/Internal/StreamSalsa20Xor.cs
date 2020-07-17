@@ -12,9 +12,11 @@ namespace NaCl.Internal
             if (m.Length == 0)
                 return;
 
-            var input = new byte[16];
-            var block = new byte[64];
-            var kcopy = k.Slice(0, 32).ToArray();
+            Span<byte> input = stackalloc byte[16];
+            Span<byte> block = stackalloc byte[64];
+            Span<byte> kcopy = stackalloc byte[32];
+            k.Slice(0, 32).CopyTo(kcopy);
+            
             try
             {
                 UInt32 u;
@@ -62,8 +64,8 @@ namespace NaCl.Internal
             }
             finally
             {
-                Array.Clear(block, 0, block.Length);
-                Array.Clear(kcopy, 0, kcopy.Length);
+                block.Clear();
+                kcopy.Clear();
             }
         }
     }
