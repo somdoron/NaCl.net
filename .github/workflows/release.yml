@@ -21,7 +21,13 @@ jobs:
       shell: bash
     - run: echo ${{ steps.get_version.outputs.VERSION }}
     - run: dotnet restore .
-    - run: dotnet pack NaCl.net -o . -c Release /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} /p:Version=${{ steps.get_version.outputs.VERSION }} /p:ContinuousIntegrationBuild=true
+    - run: dotnet build NaCl.net -c Release /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} /p:Version=${{ steps.get_version.outputs.VERSION }} /p:ContinuousIntegrationBuild=true
+    - run: sn -R NaCl.net/bin/Release/net45/NaCl.dll nacl.net.snk
+    - run: sn -R NaCl.net/bin/Release/net472/NaCl.dll nacl.net.snk
+    - run: sn -R NaCl.net/bin/Release/netstandard1.3/NaCl.dll nacl.net.snk
+    - run: sn -R NaCl.net/bin/Release/netstandard2.0/NaCl.dll nacl.net.snk
+    - run: sn -R NaCl.net/bin/Release/netstandard2.1/NaCl.dll nacl.net.snk
+    - run: dotnet pack NaCl.net --no-build -o . -c Release /p:PackageVersion=${{ steps.get_version.outputs.VERSION }} /p:Version=${{ steps.get_version.outputs.VERSION }} /p:ContinuousIntegrationBuild=true
     - run: dotnet nuget push *.nupkg -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
       env:
         NUGET_API_KEY: ${{ secrets.NuGetAPIKey }}

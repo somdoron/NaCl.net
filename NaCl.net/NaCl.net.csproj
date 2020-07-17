@@ -12,7 +12,7 @@
     <Description>Port of Curve25519, XSalsa20 and Poly1305 from NaCl project</Description>
     <PackageProjectUrl>https://github.com/somdoron/nacl.net</PackageProjectUrl>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\nacl.net.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\publicKey.snk</AssemblyOriginatorKeyFile>
     <PublicSign>false</PublicSign>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/somdoron/NaCl.net.git</RepositoryUrl>
@@ -24,6 +24,7 @@
     <Title>C# port of NaCl crypto library</Title>
     <RepositoryType>git</RepositoryType>
     <PackageTags>NaCl libsodium sodium curve25519 xsalsa poly1305</PackageTags>
+    <DelaySign>true</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>
@@ -49,6 +50,12 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Memory" Version="4.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\publicKey.snk">
+      <Link>publicKey.snk</Link>
+    </None>
   </ItemGroup>
   
 </Project>
