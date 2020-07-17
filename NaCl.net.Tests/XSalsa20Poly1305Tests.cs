@@ -113,5 +113,45 @@ namespace NaCl.Tests
             Console.WriteLine("Encrypt + Decrypt took " + sw.ElapsedMilliseconds);
             Assert.AreEqual(message, message2);
         }
+
+        [Test]
+        public void TestPerformanceSmallPayload()
+        {
+            var firstkey = new byte[]
+            {
+                0x1b, 0x27, 0x55, 0x64, 0x73, 0xe9, 0x85,
+                0xd4, 0x62, 0xcd, 0x51, 0x19, 0x7a, 0x9a,
+                0x46, 0xc7, 0x60, 0x09, 0x54, 0x9e, 0xac,
+                0x64, 0x74, 0xf2, 0x06, 0xc4, 0xee, 0x08,
+                0x44, 0xf6, 0x83, 0x89
+            };
+
+            var nonce = new byte[]
+            {
+                0x69, 0x69, 0x6e, 0xe9, 0x55, 0xb6,
+                0x2b, 0x73, 0xcd, 0x62, 0xbd, 0xa8,
+                0x75, 0xfc, 0x73, 0xd6, 0x82, 0x19,
+                0xe0, 0x03, 0x6b, 0x7a, 0x0b, 0x37
+            };
+
+            var message = new byte[128];
+            message[0] = 1;
+
+            var message2 = new byte[message.Length];
+
+            var cipher = new byte[message.Length + XSalsa20Poly1305.TagLength];
+
+            var xSalsa20Poly1305 = new XSalsa20Poly1305(firstkey);
+
+            var sw = Stopwatch.StartNew();
+            int counter = 0;
+            do
+            {
+                xSalsa20Poly1305.Encrypt(cipher, message, nonce);
+                xSalsa20Poly1305.TryDecrypt(message2, cipher, nonce);
+                counter++;
+            } while (sw.ElapsedMilliseconds < 10000);
+            Console.WriteLine("iterations " + counter);
+        }
     }
 }
