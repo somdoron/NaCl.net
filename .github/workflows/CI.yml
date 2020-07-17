@@ -6,12 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Decrypt snk
-      uses: shinhwagk/actions-crypto@0.0.9
-      with:
-        crypto-path: nacl.net.snk.enc
-        crypto-action: dec
-        crypto-password: ${{ secrets.SNK_SECRET }}
     - run: dotnet restore .
     - name: build 
       run: dotnet build .
