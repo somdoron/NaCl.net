@@ -25,6 +25,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>NaCl libsodium sodium curve25519 xsalsa poly1305</PackageTags>
     <DelaySign>true</DelaySign>
+    <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
