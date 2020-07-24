@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using NetMQ.Utils;
 
 namespace NaCl.Internal
 {
@@ -62,8 +63,9 @@ namespace NaCl.Internal
             }
             finally
             {
-                Array.Clear(block, 0, block.Length);
-                Array.Clear(kcopy, 0, kcopy.Length);
+                input.Clear();
+                block.Clear();
+                kcopy.Clear();
             }
         }
     }
