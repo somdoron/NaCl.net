@@ -14,10 +14,9 @@ namespace NaCl.Internal
             if (c.IsEmpty)
                 return;
 
-            Span<byte> input = stackalloc byte[16];
-            Span<byte> block = stackalloc byte[64];
-            Span<byte> kcopy = stackalloc byte[32];
-            k.CopyTo(kcopy);
+            var input = new byte[16];
+            var block = new byte[64];
+            var kcopy = k.ToArray();
             try
             {
                 for (int i = 0; i < 8; i++)
@@ -49,8 +48,8 @@ namespace NaCl.Internal
             }
             finally
             {
-                block.Clear();
-                kcopy.Clear();
+                Array.Clear(block, 0, block.Length);
+                Array.Clear(kcopy, 0, kcopy.Length);
             }
         }
     }
