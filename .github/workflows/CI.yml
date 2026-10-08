@@ -6,6 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y libssl-dev
     - uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '3.0.x'
@@ -13,5 +15,5 @@ jobs:
     - name: build 
       run: dotnet build .
     - name: test 
-      run: dotnet test NaCl.net.Tests
+      run: dotnet test NaCl.net.Tests --framework netcoreapp3.0
 
