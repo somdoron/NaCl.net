@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   ununtu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -16,4 +16,3 @@ jobs:
       run: dotnet build .
     - name: test 
       run: dotnet test NaCl.net.Tests --framework netcoreapp3.0
-
