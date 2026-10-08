@@ -6,6 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '3.0.x'
     - run: dotnet restore .
     - name: build 
       run: dotnet build .
