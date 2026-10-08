@@ -44,7 +44,6 @@ namespace NaCl
         /// </summary>
         public const int NonceLength = 24;
 
-        private Poly1305 poly1305;
         internal byte[] key;
 
         /// <summary>
@@ -57,7 +56,6 @@ namespace NaCl
             if (key.Length != KeyLength)
                 throw new ArgumentException("key length must be 32 bytes");
             this.key = key.ToArray();
-            poly1305 = new Poly1305();
         }
 
         /// <summary>
@@ -70,12 +68,10 @@ namespace NaCl
             if (key.Length != KeyLength)
                 throw new ArgumentException("key length must be 32 bytes");
             this.key = (byte[]) key.Clone();
-            poly1305 = new Poly1305();
         }
 
         internal XSalsa20Poly1305()
         {
-            poly1305 = new Poly1305();
             this.key = new byte[KeyLength];
         }
 
@@ -106,7 +102,7 @@ namespace NaCl
 
             StreamSalsa20Xor.Transform(block0, block0.Slice(0, mlen0 + ZeroBytesLength), nonce.Slice(16), subkey);
 
-            poly1305.SetKey(block0.Slice(0, Poly1305.KeyLength));
+            using var poly1305 = new Poly1305(block0.Slice(0, Poly1305.KeyLength));
             for (int i = 0; i < mlen0; i++)
                 cipher[i] = block0[ZeroBytesLength + i];
             block0.Clear();
@@ -190,7 +186,7 @@ namespace NaCl
             HSalsa20.Transform(subkey, nonce, key, ReadOnlySpan<byte>.Empty);
             StreamSalsa20.Transform(block0.Slice(0, StreamSalsa20.KeyLength), nonce.Slice(16), subkey);
 
-            poly1305.SetKey(block0.Slice(0, Poly1305.KeyLength));
+            using var poly1305 = new Poly1305(block0.Slice(0, Poly1305.KeyLength));
             if (!poly1305.Verify(mac, cipher))
             {
                 poly1305.Reset();
@@ -281,7 +277,6 @@ namespace NaCl
         public void Dispose()
         {
             Array.Clear(key, 0, key.Length);
-            poly1305.Dispose();
         }
     }
 }

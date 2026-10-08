@@ -24,13 +24,13 @@ namespace NaCl
         /// The length of the produced tag, 16 bytes.
         /// </summary>
         public const int TagLength = BlockLength;
-        
-        UInt32[] r = new UInt32[5];
-        UInt32[] h = new UInt32[5];
-        UInt32[] pad = new UInt32 [4];
-        int leftover;
-        byte[] buffer = new byte[BlockLength];
-        bool final;
+
+        private readonly UInt32[] r = new UInt32[5];
+        private readonly UInt32[] h = new UInt32[5];
+        private readonly UInt32[] pad = new UInt32 [4];
+        private int leftover;
+        private readonly byte[] buffer = new byte[BlockLength];
+        private bool final;
         
         /// <summary>
         /// Create a new Poly1305 object with the specified key.
