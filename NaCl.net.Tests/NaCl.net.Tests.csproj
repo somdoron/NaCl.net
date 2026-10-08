@@ -5,7 +5,7 @@
     <AssemblyName>NaCl.Tests</AssemblyName>
     <RootNamespace>NaCl.Tests</RootNamespace>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\nacl.net.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\publicKey.snk</AssemblyOriginatorKeyFile>
     <PublicSign>true</PublicSign>
   </PropertyGroup>
 
